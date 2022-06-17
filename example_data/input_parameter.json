@@ -1,23 +1,19 @@
-input_parameters = {
-#&CONTROL
-    "file_name":"pw.in",
-    "prefix":'pw',
+{   "file_name":"pw.in",
+    "prefix":"pw",
     "calculation":"vc-relax",
     "etot_conv_thr": "1d-05",
     "forc_conv_thr": "1d-04",
-    "outdir": './outdir',
-    "pseudo_dir":'../pseudos/',
+    "outdir": "./outdir",
+    "pseudo_dir":"../pseudos/",
     "tprnfor" : "true",
     "tstress" : "true",
-#&SYSTEM    
     "degauss":"0.01",
     "ecutwfc":"100",
     "ibrav":"0",
     "nat":"6",
     "ntyp":"2",
-    "occupations":'smearing',
-    "smearing":'fd',
-#&ELECTRONS
+    "occupations":"smearing",
+    "smearing":"fd",
     "conv_thr":"1d-08",
     "mixing_mode":"local-TF"   
 }

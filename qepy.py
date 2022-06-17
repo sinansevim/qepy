@@ -5,28 +5,28 @@ import pandas as pd
 def generate_input(parameters):
     filedata = f"""
 &CONTROL
-etot_conv_thr = {parameters['etot_conv_thr']}
-forc_conv_thr = {parameters['forc_conv_thr']}
-prefix = '{parameters['prefix']}'
-calculation = '{parameters['calculation']}'
-outdir = '{parameters['outdir']}'
-pseudo_dir = '{parameters['pseudo_dir']}'
-tprnfor = .{parameters['tprnfor']}.
-tstress = .{parameters['tstress']}.
+etot_conv_thr =  {parameters['etot_conv_thr']}
+forc_conv_thr =  {parameters['forc_conv_thr']}
+prefix        = '{parameters['prefix']}'
+calculation   = '{parameters['calculation']}'
+outdir        = '{parameters['outdir']}'
+pseudo_dir    = '{parameters['pseudo_dir']}'
+tprnfor       = .{parameters['tprnfor']}.
+tstress       = .{parameters['tstress']}.
 /
 &SYSTEM
-  degauss = {parameters['degauss']}
-  ecutwfc =  {parameters['ecutwfc']}
-  ecutrho = {parameters["ecutrho"]}
-  ibrav = {parameters['ibrav']}
-  nat = {parameters['nat']}
-  ntyp = {parameters['ntyp']}
+  degauss     = {parameters['degauss']}
+  ecutwfc     = {parameters['ecutwfc']}
+  ecutrho     = {parameters["ecutrho"]}
+  ibrav       = {parameters['ibrav']}
+  nat         = {parameters['nat']}
+  ntyp        = {parameters['ntyp']}
   occupations = '{parameters['occupations']}'
-  smearing = '{parameters['smearing']}'
+  smearing    = '{parameters['smearing']}'
 /
 &ELECTRONS
-  conv_thr =   {parameters['conv_thr']}
-  mixing_mode='{parameters['mixing_mode']}'
+  conv_thr    =  {parameters['conv_thr']}
+  mixing_mode = '{parameters['mixing_mode']}'
 /
 &IONS
 /
@@ -36,26 +36,25 @@ tstress = .{parameters['tstress']}.
     with open(parameters['file_name'], 'w') as file:
         file.write(filedata)
     write_atom_species(parameters['file_name'], parameters['atomic_species'])
-    write_atom_positions(parameters['file_name'],
-                         parameters['atomic_positions'])
-    write_cell_parameters(
-        parameters['file_name'], parameters['cell_parameters'])
+    write_atom_positions(parameters['file_name'],parameters['atomic_positions'])
+    write_cell_parameters(parameters['file_name'], parameters['cell_parameters'])
     write_k_points(parameters['file_name'], parameters['k_points'])
     return
 
 
-def write_atom_species(file, species):
+def write_atom_species(file,atomic_species):
     with open(file, "a") as file_object:
         file_object.write("ATOMIC_SPECIES \n")
-        for i in species:
-            file_object.write(" ".join(i)+'\n')
+        for atom in atomic_species:
+            listed = list(atom.values())
+            file_object.write(" ".join(listed)+'\n')
 
 
 def write_atom_positions(file, positions):
     with open(file, "a") as file_object:
         file_object.write("ATOMIC_POSITIONS (crystal) \n")
         for i in positions:
-            file_object.write(" ".join(i)+'\n')
+            file_object.write(" ".join(i.astype(str))+'\n')
 
 
 def write_cell_parameters(file, cell):
@@ -99,3 +98,16 @@ def make_monolayer(atoms):
     df_shifted["y"] = df['y'].values
     df_shifted["z"] = df['z'].values+0.25
     return df_shifted.values
+
+
+def read_relax(path):
+    data = open(path, 'r').readlines()
+    begin = 0
+    end = 0
+    for i in range(len(data)):
+        if data[i] == 'Begin final coordinates\n':
+            begin = i
+        if data[i] == 'End final coordinates\n':
+            end = i
+    atoms = np.array([i.split() for i in data[begin+3:end]])
+    return atoms
