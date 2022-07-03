@@ -1,6 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import os
+
 
 out_files = os.listdir('./outputs/')
 

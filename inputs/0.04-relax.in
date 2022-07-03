@@ -1,0 +1,42 @@
+
+&CONTROL
+etot_conv_thr =  1d-05
+forc_conv_thr =  1d-04
+prefix        = 'pw'
+calculation   = 'vc-relax'
+outdir        = './outdir'
+pseudo_dir    = '../pseudos/'
+tprnfor       = .true.
+tstress       = .true.
+/
+&SYSTEM
+  degauss     = 0.04
+  ecutwfc     = 100
+  ecutrho     = 800
+  ibrav       = 0
+  nat         = 3
+  ntyp        = 2
+  occupations = 'smearing'
+  smearing    = 'fd'
+/
+&ELECTRONS
+  conv_thr    =  1d-08
+  mixing_mode = 'local-TF'
+/
+&IONS
+/
+&CELL
+/   
+ATOMIC_SPECIES 
+Nb 92.90 Nb.pbe-spn-rrkjus_psl.1.0.0.UPF
+Se 78.96 Se.pbe-mt_fhi.UPF
+ATOMIC_POSITIONS (crystal) 
+Nb -0.0 -0.0 0.5
+Se 0.3333333333 0.6666666667 0.37994325409999996
+Se 0.3333333333 0.6666666667 0.6200567458999999
+CELL_PARAMETERS (angstrom) 
+3.483076567 0.0 -0.0
+-1.741538284 3.016432791 0.0
+-0.0 -0.0 14.100479994
+K_POINTS automatic 
+20 20 10 0 0 0

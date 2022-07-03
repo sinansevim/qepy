@@ -9,11 +9,21 @@
     "tstress" : "true",
     "degauss":"0.01",
     "ecutwfc":"100",
+    "ecutrho":"800",
     "ibrav":"0",
     "nat":"6",
     "ntyp":"2",
     "occupations":"smearing",
     "smearing":"fd",
     "conv_thr":"1d-08",
-    "mixing_mode":"local-TF"   
+    "mixing_mode":"local-TF",
+    "atomic_species":[{"atom":"Nb","mass":"92.90","pseudopotential":"Nb.pbe-spn-rrkjus_psl.1.0.0.UPF"},
+                      {"atom":"Se","mass":"78.96","pseudopotential":"Se.pbe-mt_fhi.UPF"}],
+    "atomic_positions":[],
+    "cell_parameters":[],
+    "k_points": "20 20 10 0 0 0",
+     "k_points_bands":[{"x":"0","y":"0","z":"0","number":"200","label":" ! G"},
+                       {"x":"0","y":"0.5","z":"0","number":"200","label":" ! M"},
+                       {"x":"0.3333333","y":"0.3333333","z":"0","number":"200","label":" ! K"},
+                       {"x":"0","y":"0","z":"0","number":"200","label":" ! G"}]
 }
