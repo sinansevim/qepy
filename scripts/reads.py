@@ -1,5 +1,32 @@
 import numpy as np
 
+def read_pp(paths):
+    elements = []
+    wavefunction = []
+    chargedensity = []
+    for path in paths:
+        pp = {"Element":"","Wavefunction":50,"Chargedensity:":200}
+        with open(path, 'r') as data:
+            data = data.read().split()
+            for i in range(200):
+                if data[i] =="Element:":
+                    # print(str(f"Element: {data[i+1]}"))
+                    pp["Element"]=data[i+1]
+                if data[i] =="wavefunctions:":
+                    # print(f"Wave function cutoff: {float(data[i+1])}")
+                    pp["Wavefunction"]=data[i+1]
+                if data[i] =="density:":
+                    # print(f"Charge density cutoff: {float(data[i+1])}")
+                    pp["Chargedensity"]=data[i+1]
+
+        elements.append(pp['Element'])
+        wavefunction.append(float(pp['Wavefunction']))
+        chargedensity.append(float(pp['Chargedensity']))
+    chargedensity.sort()
+    wavefunction.sort()
+    return(elements,wavefunction[-1]*1.5,chargedensity[-1]*1.5)
+
+
 def read_poscar(path):
     data = open("./example_data/NbSe2.poscar", 'r').readlines()
     cell =[]
