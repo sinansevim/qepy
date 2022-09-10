@@ -15,5 +15,7 @@ Read from vc-relax or poscar file
 
 # Input Example
 python run.py -c vc-relax -d 0.001 -i ./vc-relax.out
+
 python run.py -c vc-relax -d 0.2 -i ./NbSe2.poscar
+
 python run.py -c scf -d 0.05 -k 30 30 1 0 0 0
