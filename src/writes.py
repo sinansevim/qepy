@@ -31,8 +31,6 @@ def write_k_points(file, k):
         file_object.write("K_POINTS automatic \n")
         file_object.write(k+'\n')
 
-
-
 def write_k_points_bands(file,k):
     with open(file, "a") as file_object:
         file_object.write("K_POINTS crystal_b \n")
@@ -40,4 +38,12 @@ def write_k_points_bands(file,k):
         for point in k:
             listed = list(point.values())
             file_object.write(" ".join(listed)+'\n')
+
+def write_k_points_matdyn(file,k):
+    with open(file, "a") as file_object:
+        file_object.write(str(len(k))+'\n')
+        for point in k:
+            listed = list(point.values())
+            file_object.write(" ".join(listed)+'\n')
+
 

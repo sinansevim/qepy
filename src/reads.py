@@ -28,7 +28,7 @@ def read_pp(paths):
 
 
 def read_poscar(path):
-    data = open("./example_data/NbSe2.poscar", 'r').readlines()
+    data = open(path, 'r').readlines()
     cell =[]
     for i in data[2:5]:
         line=i.split()
@@ -67,3 +67,12 @@ def read_relax(path):
             end = i
     atoms = np.array([i.split() for i in data[begin+3:end]])
     return atoms
+
+def symmetries(fstring):
+    f = open(fstring, 'r')
+    x = np.zeros(0)
+    for i in f:
+        if "high-symmetry" in i:
+            x = np.append(x, float(i.split()[-1]))
+    f.close()
+    return x

@@ -26,6 +26,7 @@ tstress       = .{parameters['tstress']}.
   ntyp        = {parameters['ntyp']}
   occupations = '{parameters['occupations']}'
   smearing    = '{parameters['smearing']}'
+  nosym    = .{parameters['nosym']}.
 /
 &ELECTRONS
   conv_thr    =  {parameters['conv_thr']}
@@ -53,9 +54,66 @@ def bands_pp(parameters):
 &bands
 outdir = '{parameters['outdir']}'
 prefix = '{parameters['prefix']}'
-filband ='{parameters['prefix']}.bands.dat'
+filband = '{parameters['outdir']}bands.dat'
 /
 """
     with open(parameters['file_name'], 'w') as file:
+        file.write(filedata)
+    return
+
+
+def ph(parameters):
+    filedata = f"""
+&inputph
+  prefix = '{parameters['prefix']}'
+  fildyn = './dyn/{parameters['prefix']}/{parameters['prefix']}.dyn',
+  outdir = '{parameters['outdir']}'
+  ldisp  = {parameters['ldisp']},
+  trans  = {parameters['trans']},
+  fildvscf = 'dvscf',
+  nq1    = {parameters['nq1']},
+  nq2    = {parameters['nq2']},
+  nq3    = {parameters['nq3']},
+  tr2_ph = {parameters['tr2_ph']},
+  /
+"""
+    with open(parameters['file_name'], 'w') as file:
+        file.write(filedata)
+    return
+
+def q2r(parameters):
+    filedata = f"""
+&input
+  fildyn = './dyn/{parameters['prefix']}/{parameters['prefix']}.dyn',
+  zasr = 'simple'
+  flfrc = './dyn/{parameters['prefix']}/{parameters['prefix']}.fc'
+/
+"""
+    with open(parameters['file_name'], 'w') as file:
+        file.write(filedata)
+    return
+
+def matdyn(parameters):
+    filedata = f"""
+&input
+  asr = 'simple'
+  flfrc = './dyn/{parameters['prefix']}/{parameters['prefix']}.fc'
+  flfrq = './dyn/{parameters['prefix']}/{parameters['prefix']}.freq'
+  q_in_band_form=.true.
+  q_in_cryst_coord=.true.
+/
+"""
+    with open(parameters['file_name'], 'w') as file:
+        file.write(filedata)
+    writes.write_k_points_matdyn(parameters['file_name'], parameters['k_points_bands'])
+    return
+
+def plotband(parameters):
+    filedata = f"""
+{parameters['prefix']}.freq
+0 550
+{parameters['prefix']}.xmgr
+"""
+    with open(f"./dyn/{parameters['prefix']}/{parameters['prefix']}-plotband.in", 'w') as file:
         file.write(filedata)
     return
