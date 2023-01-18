@@ -53,7 +53,7 @@ def bands_pp(parameters):
 &bands
 outdir = '{parameters['outdir']}'
 prefix = '{parameters['prefix']}'
-filband = f'{parameters['prefix']}.bands.dat'
+filband ='{parameters['prefix']}.bands.dat'
 /
 """
     with open(parameters['file_name'], 'w') as file:
