@@ -1,6 +1,8 @@
 #### Local testing variables ####
-QE=/Users/sinansevim/work_dir/q-e-qe-7.2/bin
-SLURM_NTASKS=1
+#Path to quantum-espresso
+QE=/path/to/quantum/espresso
+#Number of cores
+SLURM_NTASKS=number_of_cores
 
 #Initial degauss value (0 for POSCAR initialization)
 initial=0
