@@ -23,21 +23,22 @@ def generate(parameter, calculation, degauss, initial_guess=None, k_points=None,
     input_parameters["file_name"] = f"./results/{degauss}/{calculation}.in"
     input_parameters["degauss"] = degauss
     input_parameters["outdir"] = f"./results/{degauss}/"
+    nat = int(input_parameters['nat'])
 
 
     if calculation == 'vc-relax':
         # Import initial cell and atom parameters
         if initial_guess != None:
-            cell, atoms = reads.read_vc_relax(f"{initial_guess}")
+            cell, atoms = reads.read_vc_relax(f"{initial_guess}",nat)
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
 
     elif calculation == 'relax':
-        cell, atoms = reads.read_vc_relax(f"./results/{degauss}/vc-relax.out")
+        cell, atoms = reads.read_vc_relax(f"./results/{degauss}/vc-relax.out",nat)
         atoms = utils.make_monolayer(atoms)
 
     else:
-        cell, temp = reads.read_vc_relax(f"./results/{degauss}/vc-relax.out")
+        cell, temp = reads.read_vc_relax(f"./results/{degauss}/vc-relax.out",nat)
         atoms = reads.read_relax(f"./results/{degauss}/relax.out")
 
     if k_points != None:
