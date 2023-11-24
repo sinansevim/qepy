@@ -20,7 +20,8 @@ def pw(parameters):
                             json.loads(l)
                             file.write(f"{k} = .{l}. \n")
                         except:
-                            file.write(f"{k} = '{l}' \n")
+                            if(bool(l)):
+                                file.write(f"{k} = '{l}' \n")
                 file.write("/ \n")
             except:
                 pass
