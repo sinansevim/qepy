@@ -1,14 +1,13 @@
 {
   "file_name": "",
+  "file_path": "",
   "control": {
     "prefix": "",
     "outdir": "",
     "calculation": "vc-relax",
     "etot_conv_thr": "1e-03",
     "forc_conv_thr": "1e-02",
-    "pseudo_dir": "./pseudos/",
-    "tprnfor": "true",
-    "tstress": "true"
+    "pseudo_dir": "./pseudos/"
   },
   "system": {
     "degauss": "0.1",
@@ -22,8 +21,7 @@
     "smearing": "fd"
   },
   "electrons": {
-    "conv_thr": "1e-6",
-    "mixing_mode": "local-TF"
+    "conv_thr": "1e-6"
   },
   "ions": {},
   "cell": {},

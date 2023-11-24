@@ -6,7 +6,7 @@ from . import utils
 import json
 
 def pw(parameters):
-    with open(parameters['file_name'], 'w') as file:
+    with open(parameters['file_path'], 'w') as file:
         for i,j in parameters.items():
             try:
                 if(type(j)==dict):
@@ -25,13 +25,13 @@ def pw(parameters):
                 file.write("/ \n")
             except:
                 pass
-    writes.write_atom_species(parameters['file_name'], parameters['atomic_species'])
-    writes.write_atom_positions(parameters['file_name'],parameters['atomic_positions'])
-    writes.write_cell_parameters(parameters['file_name'], parameters['cell_parameters'])
+    writes.write_atom_species(parameters['file_path'], parameters['atomic_species'])
+    writes.write_atom_positions(parameters['file_path'],parameters['atomic_positions'])
+    writes.write_cell_parameters(parameters['file_path'], parameters['cell_parameters'])
     if parameters["control"]['calculation']=='bands':
-        writes.write_k_points_bands(parameters['file_name'], parameters['k_points_bands'])
+        writes.write_k_points_bands(parameters['file_path'], parameters['k_points_bands'])
     else:
-        writes.write_k_points(parameters['file_name'], parameters['k_points'])
+        writes.write_k_points(parameters['file_path'], parameters['k_points'])
     return
 
 
@@ -43,7 +43,7 @@ prefix = '{parameters["control"]['prefix']}'
 filband = '{parameters["control"]['outdir']}bands.dat'
 /
 """
-    with open(parameters['file_name'], 'w') as file:
+    with open(parameters['file_path'], 'w') as file:
         file.write(filedata)
     return
 
@@ -63,7 +63,7 @@ def ph(parameters):
   tr2_ph = {parameters["ph"]['tr2_ph']},
   /
 """
-    with open(parameters['file_name'], 'w') as file:
+    with open(parameters['file_path'], 'w') as file:
         file.write(filedata)
     return
 
@@ -75,7 +75,7 @@ def q2r(parameters):
   flfrc = './dyn/{parameters['prefix']}/{parameters['prefix']}.fc'
 /
 """
-    with open(parameters['file_name'], 'w') as file:
+    with open(parameters['file_path'], 'w') as file:
         file.write(filedata)
     return
 
@@ -89,9 +89,9 @@ def matdyn(parameters):
   q_in_cryst_coord=.true.
 /
 """
-    with open(parameters['file_name'], 'w') as file:
+    with open(parameters['file_path'], 'w') as file:
         file.write(filedata)
-    writes.write_k_points_matdyn(parameters['file_name'], parameters['k_points_bands'])
+    writes.write_k_points_matdyn(parameters['file_path'], parameters['k_points_bands'])
     return
 
 def plotband(parameters):

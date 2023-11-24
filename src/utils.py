@@ -5,6 +5,7 @@ import os
 
 def make_monolayer(atoms):
     df = pd.DataFrame()
+    atoms=np.array(atoms)
     df['Atoms'] = atoms.T[0]
     df['x'] = atoms.T[1].astype(float)
     df['y'] = atoms.T[2].astype(float)

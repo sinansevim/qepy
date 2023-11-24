@@ -1,8 +1,7 @@
 import sys
 import argparse
-from src.generate import *
-parameter = './input.json'
-
+import json
+from src import generate
 
 # Construct the argument parser
 ap = argparse.ArgumentParser()
@@ -50,6 +49,10 @@ poscar = args['poscar']
 # print(f"Initial path: {initial}")
 # print(f"Initial path: {poscar}")
 
+with open(f'{parameter}') as f:
+        data = f.read()
+        input_parameters = json.loads(data)
 
-generate(project_name,parameter, calculation, degauss, k_points=k_points,
+
+generate.input(project_name,input_parameters, calculation, degauss, k_points=k_points,
          initial_guess=initial, poscar=poscar,layer=layer)
