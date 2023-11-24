@@ -6,30 +6,27 @@ import json
 import os
 
 
-def generate(parameter, calculation, degauss, initial_guess=None, k_points=None, poscar=None):
+def generate(project_name,parameter, calculation, degauss=None, initial_guess=None, k_points=None, poscar=None, layer=None):
 
     with open(f'{parameter}') as f:
         data = f.read()
     input_parameters = json.loads(data)
 
-    project_name = input_parameters["project_name"]
-
     try:
-        os.makedirs('./results')
-        os.makedirs(f'./results/{degauss}')
-        os.makedirs(f'./results/{degauss}')
+        os.makedirs(f'./{project_name}')
+        os.makedirs(f'./{project_name}/{degauss}')
     except:
         try:
-            os.makedirs(f'./results/{degauss}')
+            os.makedirs(f'./{project_name}/{degauss}')
         except:
             pass
 
 
     # Set parameters from input
-    input_parameters["file_name"] = f"./results/{degauss}/{calculation}.in"
-    input_parameters["pw"]["system"]["degauss"] = degauss
-    input_parameters["outdir"] = f"./results/{degauss}/"
-    nat = int(input_parameters["pw"]["system"]['nat'])
+    input_parameters["file_name"] = f"./{project_name}/{degauss}/{calculation}.in"
+    input_parameters["system"]["degauss"] = degauss
+    input_parameters["control"]["outdir"] = f"./{project_name}/{degauss}/"
+    nat = int(input_parameters["system"]['nat'])
 
 
     if calculation == 'vc-relax':
@@ -40,21 +37,22 @@ def generate(parameter, calculation, degauss, initial_guess=None, k_points=None,
             cell, atoms = reads.read_poscar(f'{poscar}')
 
     elif calculation == 'relax':
-        cell, atoms = reads.read_vc_relax(f"./results/{degauss}/vc-relax.out",nat)
-        atoms = utils.make_monolayer(atoms)
+        cell, atoms = reads.read_vc_relax(f"./{project_name}/{degauss}/vc-relax.out",nat)
+        if(layer=='mono'):
+            atoms = utils.make_monolayer(atoms)
 
     else:
-        cell, temp = reads.read_vc_relax(f"./results/{degauss}/vc-relax.out",nat)
-        atoms = reads.read_relax(f"./results/{degauss}/relax.out")
+        cell, temp = reads.read_vc_relax(f"./{project_name}/{degauss}/vc-relax.out",nat)
+        atoms = reads.read_relax(f"./{project_name}/{degauss}/relax.out")
 
     if k_points != None:
         input_parameters['k_points'] = k_points
 
-    input_parameters['prefix'] = degauss
-    input_parameters["pw"]["system"]['nat'] = len(atoms)
-    input_parameters["pw"]['atomic_positions'] = atoms
-    input_parameters["pw"]['cell_parameters'] = cell
-    input_parameters["pw"]["control"]['calculation'] = calculation
+    input_parameters["control"]['prefix'] = degauss
+    input_parameters["system"]['nat'] = len(atoms)
+    input_parameters['atomic_positions'] = atoms
+    input_parameters['cell_parameters'] = cell
+    input_parameters["control"]['calculation'] = calculation
 
     if calculation == 'bands-pp':
         scaffold.bands_pp(input_parameters)

@@ -7,7 +7,7 @@ import json
 
 def pw(parameters):
     with open(parameters['file_name'], 'w') as file:
-        for i,j in parameters["pw"].items():
+        for i,j in parameters.items():
             try:
                 if(type(j)==dict):
                     file.write(f"&{i.upper()} \n")
@@ -25,22 +25,22 @@ def pw(parameters):
                 file.write("/ \n")
             except:
                 pass
-    writes.write_atom_species(parameters['file_name'], parameters["pw"]['atomic_species'])
-    writes.write_atom_positions(parameters['file_name'],parameters["pw"]['atomic_positions'])
-    writes.write_cell_parameters(parameters['file_name'], parameters["pw"]['cell_parameters'])
-    if parameters["pw"]["control"]['calculation']=='bands':
-        writes.write_k_points_bands(parameters['file_name'], parameters["pw"]['k_points_bands'])
+    writes.write_atom_species(parameters['file_name'], parameters['atomic_species'])
+    writes.write_atom_positions(parameters['file_name'],parameters['atomic_positions'])
+    writes.write_cell_parameters(parameters['file_name'], parameters['cell_parameters'])
+    if parameters["control"]['calculation']=='bands':
+        writes.write_k_points_bands(parameters['file_name'], parameters['k_points_bands'])
     else:
-        writes.write_k_points(parameters['file_name'], parameters["pw"]['k_points'])
+        writes.write_k_points(parameters['file_name'], parameters['k_points'])
     return
 
 
 def bands_pp(parameters):
     filedata = f"""
 &bands
-outdir = '{parameters['outdir']}'
-prefix = '{parameters['prefix']}'
-filband = '{parameters['outdir']}bands.dat'
+outdir = '{parameters["control"]['outdir']}'
+prefix = '{parameters["control"]['prefix']}'
+filband = '{parameters["control"]['outdir']}bands.dat'
 /
 """
     with open(parameters['file_name'], 'w') as file:
