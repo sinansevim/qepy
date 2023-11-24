@@ -3,49 +3,34 @@ import pandas as pd
 from . import reads
 from . import writes
 from . import utils
-
+import json
 
 def pw(parameters):
-    filedata = f"""
-&CONTROL
-etot_conv_thr =  {parameters['etot_conv_thr']}
-forc_conv_thr =  {parameters['forc_conv_thr']}
-prefix        = '{parameters['prefix']}'
-calculation   = '{parameters['calculation']}'
-outdir        = '{parameters['outdir']}'
-pseudo_dir    = '{parameters['pseudo_dir']}'
-tprnfor       = .{parameters['tprnfor']}.
-tstress       = .{parameters['tstress']}.
-/
-&SYSTEM
-  degauss     = {parameters['degauss']}
-  ecutwfc     = {parameters['ecutwfc']}
-  ecutrho     = {parameters["ecutrho"]}
-  ibrav       = {parameters['ibrav']}
-  nat         = {parameters['nat']}
-  ntyp        = {parameters['ntyp']}
-  occupations = '{parameters['occupations']}'
-  smearing    = '{parameters['smearing']}'
-  nosym    = .{parameters['nosym']}.
-/
-&ELECTRONS
-  conv_thr    =  {parameters['conv_thr']}
-  mixing_mode = '{parameters['mixing_mode']}'
-/
-&IONS
-/
-&CELL
-/   
-"""
     with open(parameters['file_name'], 'w') as file:
-        file.write(filedata)
-    writes.write_atom_species(parameters['file_name'], parameters['atomic_species'])
-    writes.write_atom_positions(parameters['file_name'],parameters['atomic_positions'])
-    writes.write_cell_parameters(parameters['file_name'], parameters['cell_parameters'])
-    if parameters['calculation']=='bands':
-        writes.write_k_points_bands(parameters['file_name'], parameters['k_points_bands'])
+        for i,j in parameters["pw"].items():
+            try:
+                if(type(j)==dict):
+                    file.write(f"&{i.upper()} \n")
+                for k,l in j.items():
+                    try:
+                        float(l)
+                        file.write(f"{k} = {l} \n")
+                    except:
+                        try:
+                            json.loads(l)
+                            file.write(f"{k} = .{l}. \n")
+                        except:
+                            file.write(f"{k} = '{l}' \n")
+                file.write("/ \n")
+            except:
+                pass
+    writes.write_atom_species(parameters['file_name'], parameters["pw"]['atomic_species'])
+    writes.write_atom_positions(parameters['file_name'],parameters["pw"]['atomic_positions'])
+    writes.write_cell_parameters(parameters['file_name'], parameters["pw"]['cell_parameters'])
+    if parameters["pw"]["control"]['calculation']=='bands':
+        writes.write_k_points_bands(parameters['file_name'], parameters["pw"]['k_points_bands'])
     else:
-        writes.write_k_points(parameters['file_name'], parameters['k_points'])
+        writes.write_k_points(parameters['file_name'], parameters["pw"]['k_points'])
     return
 
 
@@ -68,13 +53,13 @@ def ph(parameters):
   prefix = '{parameters['prefix']}'
   fildyn = './dyn/{parameters['prefix']}/{parameters['prefix']}.dyn',
   outdir = '{parameters['outdir']}'
-  ldisp  = {parameters['ldisp']},
-  trans  = {parameters['trans']},
-  fildvscf = 'dvscf',
-  nq1    = {parameters['nq1']},
-  nq2    = {parameters['nq2']},
-  nq3    = {parameters['nq3']},
-  tr2_ph = {parameters['tr2_ph']},
+  ldisp  = {parameters["ph"]['ldisp']},
+  trans  = {parameters["ph"]['trans']},
+  fildvscf = '{parameters["ph"]['fildvscf']}',
+  nq1    = {parameters["ph"]['nq1']},
+  nq2    = {parameters["ph"]['nq2']},
+  nq3    = {parameters["ph"]['nq3']},
+  tr2_ph = {parameters["ph"]['tr2_ph']},
   /
 """
     with open(parameters['file_name'], 'w') as file:

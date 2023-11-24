@@ -7,23 +7,29 @@ import os
 
 
 def generate(parameter, calculation, degauss, initial_guess=None, k_points=None, poscar=None):
+
+    with open(f'{parameter}') as f:
+        data = f.read()
+    input_parameters = json.loads(data)
+
+    project_name = input_parameters["project_name"]
+
     try:
         os.makedirs('./results')
+        os.makedirs(f'./results/{degauss}')
         os.makedirs(f'./results/{degauss}')
     except:
         try:
             os.makedirs(f'./results/{degauss}')
         except:
             pass
-    with open(f'{parameter}') as f:
-        data = f.read()
-    input_parameters = json.loads(data)
+
 
     # Set parameters from input
     input_parameters["file_name"] = f"./results/{degauss}/{calculation}.in"
-    input_parameters["degauss"] = degauss
+    input_parameters["pw"]["system"]["degauss"] = degauss
     input_parameters["outdir"] = f"./results/{degauss}/"
-    nat = int(input_parameters['nat'])
+    nat = int(input_parameters["pw"]["system"]['nat'])
 
 
     if calculation == 'vc-relax':
@@ -45,10 +51,10 @@ def generate(parameter, calculation, degauss, initial_guess=None, k_points=None,
         input_parameters['k_points'] = k_points
 
     input_parameters['prefix'] = degauss
-    input_parameters['nat'] = len(atoms)
-    input_parameters['atomic_positions'] = atoms
-    input_parameters['cell_parameters'] = cell
-    input_parameters['calculation'] = calculation
+    input_parameters["pw"]["system"]['nat'] = len(atoms)
+    input_parameters["pw"]['atomic_positions'] = atoms
+    input_parameters["pw"]['cell_parameters'] = cell
+    input_parameters["pw"]["control"]['calculation'] = calculation
 
     if calculation == 'bands-pp':
         scaffold.bands_pp(input_parameters)

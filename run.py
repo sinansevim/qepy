@@ -1,3 +1,4 @@
+import sys
 import argparse
 from src.generate import *
 parameter = './input.json'

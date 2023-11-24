@@ -45,5 +45,5 @@ plt.axhline(0,c='red')
 plt.ylim(-10,10)
 plt.xlim(sym[0],sym[-1])
 plt.savefig(f'band_{degauss}.png')
-plt.show()
+# plt.show()
                 
