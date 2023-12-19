@@ -13,7 +13,10 @@ def write_atom_positions(file, positions):
             try:
                 file_object.write(" ".join(i)+'\n')
             except:
-                file_object.write(" ".join(i.astype(str))+'\n')
+                try:
+                    file_object.write(" ".join(i.astype(str))+'\n')
+                except:
+                    file_object.write(" ".join(str(i))+'\n')
 
 def write_cell_parameters(file, cell):
     with open(file, "a") as file_object:
@@ -22,7 +25,10 @@ def write_cell_parameters(file, cell):
             try:
                 file_object.write(" ".join(i)+'\n')
             except:
-                file_object.write(" ".join(i.astype(str))+'\n')
+                try:
+                    file_object.write(" ".join(i.astype(str))+'\n')
+                except:
+                    file_object.write(" ".join(str(i))+'\n')
             # print(i.astype(str))
 
 

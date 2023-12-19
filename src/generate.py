@@ -5,10 +5,9 @@ import os
 import sys
 
 
-def input(project_name,input_parameters, calculation,degauss=None, file_name=None, initial_guess=None, k_points=None, poscar=None, layer=None):
-
+def input(project_name,input_parameters, calculation,degauss=None, file_name=None, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False):
     
-    
+    #Check file name, if it is None, uses degauss instead
     if (not file_name):
         if (degauss):
             file_name = degauss
@@ -16,7 +15,7 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
             sys.stdout.writelines("No file name \n")
             print("No file name")
 
-
+    #Create directory for input files
     try:
         os.makedirs(f'./{project_name}')
         os.makedirs(f'./{project_name}/{file_name}')
@@ -29,6 +28,8 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
     
     # Set parameters from input
     input_parameters["file_path"] = f"./{project_name}/{file_name}/{calculation}.in"
+
+    #If degauss is given explicitly use it instead
     if(degauss!=None):
         input_parameters["system"]["degauss"] = degauss
     input_parameters["control"]["outdir"] = f"./{project_name}/{file_name}/"
@@ -42,6 +43,7 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
 
+
     elif calculation == 'relax':
         cell, atoms = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
 
@@ -49,7 +51,7 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
     else:
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
-        else:
+        elif initial_guess != None:
             cell, temp = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
             atoms = reads.read_relax(f"./{project_name}/{file_name}/relax.out")
     if(layer=='mono'):
@@ -58,6 +60,12 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
     if k_points != None:
         input_parameters['k_points'] = k_points
 
+    if(lattice_constant):
+        cell=lattice_constant
+    if(atomic_positions):
+        atoms=atomic_positions
+
+    
     input_parameters["control"]['prefix'] = file_name
     input_parameters["system"]['nat'] = len(atoms)
     input_parameters['atomic_positions'] = atoms
@@ -78,7 +86,7 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
         scaffold.ph_plot(input_parameters)
     else:
         scaffold.pw(input_parameters)
-
+    return
 
 def runner(project_name,iteration,file_names,calculation,qe_path,ncore):
     pre = f'''QE={qe_path}

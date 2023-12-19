@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import re
+import subprocess
 
 def make_monolayer(atoms):
     df = pd.DataFrame()
@@ -48,3 +50,9 @@ def plot_sigma_energy(path):
     plt.xticks(fontsize=20)
     plt.yticks(fontsize=20)
     plt.savefig('total_sigma.png')
+
+def get_total_energy(path):
+    p = subprocess.Popen(f"grep '!' {path}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    line = p.stdout.readlines()[0].decode()
+    en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
+    return(en)
