@@ -45,13 +45,16 @@ def input(project_name,input_parameters, calculation,degauss=None, file_name=Non
 
 
     elif calculation == 'relax':
-        cell, atoms = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
+        if poscar != None:
+            cell, atoms = reads.read_poscar(f'{poscar}')
+        else:
+            cell, atoms = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
 
 
     else:
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
-        elif initial_guess != None:
+        else:
             cell, temp = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
             atoms = reads.read_relax(f"./{project_name}/{file_name}/relax.out")
     if(layer=='mono'):
