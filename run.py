@@ -51,8 +51,8 @@ poscar = args['poscar']
 
 with open(f'{parameter}') as f:
         data = f.read()
-        input_parameters = json.loads(data)
+        config = json.loads(data)
 
 
-generate.input(project_name,input_parameters, calculation, degauss, k_points=k_points,
+generate.input(project_name,config, calculation, degauss, k_points=k_points,
          initial_guess=initial, poscar=poscar,layer=layer)

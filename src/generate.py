@@ -5,90 +5,129 @@ import os
 import sys
 
 
-def input(project_name,input_parameters, calculation,degauss=None, file_name=None, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False):
+def input(project_id, calculation,config=False, degauss=None, job_id=None, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False,pseudo=False):
     
     #Check file name, if it is None, uses degauss instead
-    if (not file_name):
+    if (not job_id):
         if (degauss):
-            file_name = degauss
+            job_id = degauss
         else:
-            sys.stdout.writelines("No file name \n")
-            print("No file name")
+            # sys.stdout.writelines("No file name \n")
+            # print("No file name")
+             raise Exception("Define a job_id")
+    
+    #Default config
+    if config==False:
+        config = utils.configure()
 
     #Create directory for input files
     try:
-        os.makedirs(f'./{project_name}')
-        os.makedirs(f'./{project_name}/{file_name}')
+        os.makedirs(f'./{project_id}')
+        os.makedirs(f'./{project_id}/{job_id}')
     except:
         try:
-            os.makedirs(f'./{project_name}/{file_name}')
+            os.makedirs(f'./{project_id}/{job_id}')
         except:
             pass
 
     
     # Set parameters from input
-    input_parameters["file_path"] = f"./{project_name}/{file_name}/{calculation}.in"
+    config["file_path"] = f"./{project_id}/{job_id}/{calculation}.in"
 
     #If degauss is given explicitly use it instead
     if(degauss!=None):
-        input_parameters["system"]["degauss"] = degauss
-    input_parameters["control"]["outdir"] = f"./{project_name}/{file_name}/"
-    nat = int(input_parameters["system"]['nat'])
+        config["system"]["degauss"] = degauss
+    config["control"]["outdir"] = f"./{project_id}/{job_id}/"
+    # nat = int(config["system"]['nat'])
+    
 
+    
 
     if calculation == 'vc-relax':
         # Import initial cell and atom parameters
-        if initial_guess != None:
-            cell, atoms = reads.read_vc_relax(f"{initial_guess}",nat)
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
-
+        elif initial_guess != None:
+            cell, atoms = reads.read_vc_relax(f"{initial_guess}")
+        else:
+            try:
+                cell, atoms = config['cell_parameters'], config['atomic_positions']
+            except:
+                raise Exception("PLease enter atomic position and lattice constants")
 
     elif calculation == 'relax':
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
-        else:
-            cell, atoms = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
+        try:
+            cell, atoms = reads.read_vc_relax(f"./{project_id}/{job_id}/vc-relax.out")
+        except:
+            try:
+                cell, atoms = config['cell_parameters'], config['atomic_positions']
+            except:
+                raise Exception("PLease enter atomic position and lattice constants")
 
 
     else:
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
-        else:
-            cell, temp = reads.read_vc_relax(f"./{project_name}/{file_name}/vc-relax.out",nat)
-            atoms = reads.read_relax(f"./{project_name}/{file_name}/relax.out")
+        try:
+            cell, temp = reads.read_vc_relax(f"./{project_id}/{job_id}/vc-relax.out")
+            atoms = reads.read_relax(f"./{project_id}/{job_id}/relax.out")
+        except:
+            try:
+                cell, atoms = config['cell_parameters'], config['atomic_positions']
+            except:
+                raise Exception("PLease enter atomic position and lattice constants")
+
     if(layer=='mono'):
             atoms = utils.make_monolayer(atoms)
 
     if k_points != None:
-        input_parameters['k_points'] = k_points
+        config['k_points'] = k_points
 
     if(lattice_constant):
         cell=lattice_constant
     if(atomic_positions):
         atoms=atomic_positions
 
+
+
+
+    #Check for pseudopotentials
+    if pseudo==False:
+        config['atomic_species']=utils.default_pseudo(atoms)
+
+    config["control"]['prefix'] = job_id
+    config["system"]['nat'] = len(atoms)
+    #check types of atoms
+    try:
+        config["system"]['ntyp']
+    except:
+        config["system"]['ntyp'] = utils.atom_type(atoms)
     
-    input_parameters["control"]['prefix'] = file_name
-    input_parameters["system"]['nat'] = len(atoms)
-    input_parameters['atomic_positions'] = atoms
-    input_parameters['cell_parameters'] = cell
-    input_parameters["control"]['calculation'] = calculation
+    #check ibrav
+    try:
+        config["system"]['ibrav']
+    except:
+        config["system"]['ibrav'] = 0
+    config['atomic_positions'] = atoms
+    config['cell_parameters'] = cell
+    config["control"]['calculation'] = calculation
 
     if calculation == 'bands-pp':
-        scaffold.bands_pp(input_parameters)
+        scaffold.bands_pp(config)
     elif calculation == 'ph':
-        scaffold.ph(input_parameters)
+        scaffold.ph(config)
     elif calculation == 'q2r':
-        scaffold.q2r(input_parameters)
+        scaffold.q2r(config)
     elif calculation == 'matdyn':
-        scaffold.matdyn(input_parameters)
+        scaffold.matdyn(config)
     elif calculation == 'plotband':
-        scaffold.plotband(input_parameters)
+        scaffold.plotband(config)
     elif calculation == "ph_plot":
-        scaffold.ph_plot(input_parameters)
+        scaffold.ph_plot(config)
     else:
-        scaffold.pw(input_parameters)
+        scaffold.pw(config)
     return
 
 def runner(project_name,iteration,file_names,calculation,qe_path,ncore):

@@ -42,7 +42,7 @@ def read_poscar(path):
     return(cell,atoms)
     
         
-def read_vc_relax(path,nat):
+def read_vc_relax(path):
     vc_relax = open(path, 'r').readlines()
     begin = 0
     end = 0
@@ -53,7 +53,7 @@ def read_vc_relax(path,nat):
             end = i
     cell = np.array([i.split()
                     for i in vc_relax[begin+5:begin+8]]).astype(float)
-    atoms = np.array([i.split() for i in vc_relax[end-nat:end]])
+    atoms = np.array([i.split() for i in vc_relax[begin+10:end]])
     return(cell, atoms)
 
 def read_relax(path):

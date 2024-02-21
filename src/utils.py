@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import os
 import re
 import subprocess
+import json
+import qcelemental as qcel
+
 
 def make_monolayer(atoms):
     df = pd.DataFrame()
@@ -56,3 +59,35 @@ def get_total_energy(path):
     line = p.stdout.readlines()[0].decode()
     en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
     return(en)
+
+def configure():
+    config_path = './default_config.json'
+    with open(config_path) as f:
+        data = f.read()
+        config = json.loads(data)
+    return config
+
+def afm_maker(atom,afm_matrix):
+    # afm_matrix = [['u','u','d','d'],['u','d','u','d'],['u','d','d','u']]
+    afm =[]
+    for i in range(len(afm_matrix)):
+        # print(f"AFM{i}")
+        afm.append(np.array(atom).copy())
+        for j in range(4):
+                afm[i][j][0]=atom[j][0]+afm_matrix[i][j]
+                # print(afm[i][j][0])
+    return afm
+
+def default_pseudo(atom):
+    atom_type = list(set([a[0] for a in atom]))
+    atom_array = []
+    for i in atom_type:
+        temp_atom = {"atom":i,'mass':str(qcel.periodictable.to_mass(i)),'pseudopotential':f"{i}.UPF"}
+        atom_array.append(temp_atom)
+        # print(temp_atom)
+    # print(atom_array)  
+    return atom_array  
+
+def atom_type(atom):
+    num_type = len(list(set([a[0] for a in atom])))
+    return num_type
