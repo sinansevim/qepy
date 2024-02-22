@@ -28,7 +28,7 @@ ap.add_argument("-l", "--layer",  required=False,
 
 args = vars(ap.parse_args())
 
-project_name = args['name']
+project_id = args['name']
 # Type of calculation
 calculation = args['calculation']
 # Degauss parameter
@@ -54,5 +54,5 @@ with open(f'{parameter}') as f:
         config = json.loads(data)
 
 
-generate.input(project_name,config, calculation, degauss, k_points=k_points,
+generate.input(project_id=project_id,calculation=calculation,config=config,degauss=degauss, k_points=k_points,
          initial_guess=initial, poscar=poscar,layer=layer)
