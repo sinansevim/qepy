@@ -2,7 +2,7 @@
 
 #### Local testing variables ####
 #Path to quantum-espresso
-QE=/usr/bin
+QE=/home/susy/q-e/bin/
 #Number of cores
 SLURM_NTASKS=4
 

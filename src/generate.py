@@ -71,8 +71,11 @@ def input(project_id, calculation,config=False, degauss=None, job_id=None, initi
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
         try:
-            cell, temp = reads.read_vc_relax(f"./{project_id}/{job_id}/vc-relax.out")
-            atoms = reads.read_relax(f"./{project_id}/{job_id}/relax.out")
+            cell, atoms = reads.read_vc_relax(f"./{project_id}/{job_id}/vc-relax.out")
+            try:
+                atoms = reads.read_relax(f"./{project_id}/{job_id}/relax.out")
+            except:
+                pass
         except:
             try:
                 cell, atoms = config['cell_parameters'], config['atomic_positions']

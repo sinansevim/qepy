@@ -68,7 +68,7 @@ def read_relax(path):
     atoms = np.array([i.split() for i in data[begin+3:end]])
     return atoms
 
-def symmetries(fstring):
+def read_symmetries(fstring):
     f = open(fstring, 'r')
     x = np.zeros(0)
     for i in f:
@@ -76,3 +76,20 @@ def symmetries(fstring):
             x = np.append(x, float(i.split()[-1]))
     f.close()
     return x
+
+def read_efermi(path):
+    lines = open(path, 'r').readlines()
+    e_fermi = 0
+    for i in lines:
+        if "the Fermi energy is" in i:
+            e_fermi = float(i.split()[-2])
+            return e_fermi
+
+def read_num_bands(self):
+    directory = f"./{self.project_id}/{self.job_id}/scf.out"
+    lines = open(directory, 'r').readlines()
+    number = 0
+    for i in lines:
+        if "    number of Kohn-Sham states" in i:
+            number = float(i.split()[-1])
+            return number
