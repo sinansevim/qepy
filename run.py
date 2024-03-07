@@ -54,5 +54,5 @@ with open(f'{parameter}') as f:
         config = json.loads(data)
 
 
-generate.input(project_id=project_id,calculation=calculation,config=config,degauss=degauss, k_points=k_points,
+generate.pw_input(project_id=project_id,calculation=calculation,config=config,degauss=degauss, k_points=k_points,
          initial_guess=initial, poscar=poscar,layer=layer)
