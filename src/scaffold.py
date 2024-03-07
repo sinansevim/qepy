@@ -49,48 +49,69 @@ filband = '{parameters["control"]['outdir']}bands.dat'
 
 
 def ph(parameters):
-    filedata = f"""
-&inputph
-  prefix = '{parameters['prefix']}'
-  fildyn = './dyn/{parameters['prefix']}/{parameters['prefix']}.dyn',
-  outdir = '{parameters['outdir']}'
-  ldisp  = {parameters["ph"]['ldisp']},
-  trans  = {parameters["ph"]['trans']},
-  fildvscf = '{parameters["ph"]['fildvscf']}',
-  nq1    = {parameters["ph"]['nq1']},
-  nq2    = {parameters["ph"]['nq2']},
-  nq3    = {parameters["ph"]['nq3']},
-  tr2_ph = {parameters["ph"]['tr2_ph']},
-  /
-"""
     with open(parameters['file_path'], 'w') as file:
-        file.write(filedata)
+        for i,j in parameters.items():
+            try:
+                if(type(j)==dict):
+                    file.write(f"&{i.upper()} \n")
+                for k,l in j.items():
+                    try:
+                        float(l)
+                        file.write(f"{k} = {l} \n")
+                    except:
+                        try:
+                            json.loads(l)
+                            file.write(f"{k} = .{l}. \n")
+                        except:
+                            if(bool(l)):
+                                file.write(f"{k} = '{l}' \n")
+                file.write("/ \n")
+            except:
+                pass
     return
 
 def q2r(parameters):
-    filedata = f"""
-&input
-  fildyn = './dyn/{parameters['prefix']}/{parameters['prefix']}.dyn',
-  zasr = 'simple'
-  flfrc = './dyn/{parameters['prefix']}/{parameters['prefix']}.fc'
-/
-"""
     with open(parameters['file_path'], 'w') as file:
-        file.write(filedata)
+        for i,j in parameters.items():
+            try:
+                if(type(j)==dict):
+                    file.write(f"&{i.upper()} \n")
+                for k,l in j.items():
+                    try:
+                        float(l)
+                        file.write(f"{k} = {l} \n")
+                    except:
+                        try:
+                            json.loads(l)
+                            file.write(f"{k} = .{l}. \n")
+                        except:
+                            if(bool(l)):
+                                file.write(f"{k} = '{l}' \n")
+                file.write("/ \n")
+            except:
+                pass
     return
 
 def matdyn(parameters):
-    filedata = f"""
-&input
-  asr = 'simple'
-  flfrc = './dyn/{parameters['prefix']}/{parameters['prefix']}.fc'
-  flfrq = './dyn/{parameters['prefix']}/{parameters['prefix']}.freq'
-  q_in_band_form=.true.
-  q_in_cryst_coord=.true.
-/
-"""
     with open(parameters['file_path'], 'w') as file:
-        file.write(filedata)
+        for i,j in parameters.items():
+            try:
+                if(type(j)==dict):
+                    file.write(f"&{i.upper()} \n")
+                for k,l in j.items():
+                    try:
+                        float(l)
+                        file.write(f"{k} = {l} \n")
+                    except:
+                        try:
+                            json.loads(l)
+                            file.write(f"{k} = .{l}. \n")
+                        except:
+                            if(bool(l)):
+                                file.write(f"{k} = '{l}' \n")
+                file.write("/ \n")
+            except:
+                pass
     writes.write_k_points_matdyn(parameters['file_path'], parameters['k_points_bands'])
     return
 

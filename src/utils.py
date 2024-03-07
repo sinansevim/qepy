@@ -60,12 +60,25 @@ def get_total_energy(path):
     en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
     return(en)
 
-def configure():
-    config_path = './default_config.json'
+def configure_pw():
+    config_path = './pw_default.json'
     with open(config_path) as f:
         data = f.read()
         config = json.loads(data)
     return config
+
+def configure_ph(calculation='ph'):
+    if calculation == 'ph':
+        config_path = './ph_default.json'
+    elif calculation == 'q2r':
+        config_path = './q2r_default.json'
+    elif calculation == 'matdyn':
+        config_path = './matdyn_default.json'
+    with open(config_path) as f:
+        data = f.read()
+        config = json.loads(data)
+    return config
+
 
 def afm_maker(atom,afm_matrix):
     # afm_matrix = [['u','u','d','d'],['u','d','u','d'],['u','d','d','u']]

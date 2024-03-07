@@ -1,0 +1,24 @@
+{"pw":{
+    "control": {
+    "pseudo_dir": "./pseudos/"
+  },
+  "system": {
+    "degauss": "0.1",
+    "ecutwfc": "20",
+    "occupations": "smearing"
+  },
+  "electrons": {
+    "conv_thr": "1e-6"
+  },
+  "ions": {},
+  "cell": {},
+  "k_points": "4 4 4 0 0 0"
+},
+"ph":{"inputph":
+{
+  "ldisp": "true",
+  "nq1": "2",
+  "nq2": "2",
+  "nq3": "2"}
+}
+}

@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def input(project_id, calculation,config=False, degauss=None, job_id=None, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False,pseudo=False):
+def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False,pseudo=False):
     
     #Check file name, if it is None, uses degauss instead
     if (not job_id):
@@ -18,7 +18,7 @@ def input(project_id, calculation,config=False, degauss=None, job_id=None, initi
     
     #Default config
     if config==False:
-        config = utils.configure()
+        config = utils.configure_pw()
 
     #Create directory for input files
     try:
@@ -119,19 +119,35 @@ def input(project_id, calculation,config=False, degauss=None, job_id=None, initi
 
     if calculation == 'bands-pp':
         scaffold.bands_pp(config)
-    elif calculation == 'ph':
+    else:
+        scaffold.pw(config)
+    return
+
+
+def ph_input(project_id,calculation,job_id='default',config=False):
+    #Default config
+    if config==False:
+        config = utils.configure_ph()
+    # Set parameters from input
+    config["file_path"] = f"./{project_id}/{job_id}/{calculation}.in"
+    if calculation == 'ph':
+        config["inputph"]["outdir"] = f"./{project_id}/{job_id}/"
+        config["inputph"]['prefix'] = job_id
+        config["inputph"]["fildyn"]= f'./{project_id}/{job_id}/{job_id}.dyn'
         scaffold.ph(config)
     elif calculation == 'q2r':
+        config['input']['fildyn'] = f'./{project_id}/{job_id}/{job_id}.dyn'
+        config['input']['flfrc']  = f'./{project_id}/{job_id}/{job_id}.fc'
         scaffold.q2r(config)
     elif calculation == 'matdyn':
+        config['input']['flfrq'] = f'./{project_id}/{job_id}/{job_id}.freq'
+        config['input']['flfrc']  = f'./{project_id}/{job_id}/{job_id}.fc'
         scaffold.matdyn(config)
     elif calculation == 'plotband':
         scaffold.plotband(config)
     elif calculation == "ph_plot":
         scaffold.ph_plot(config)
-    else:
-        scaffold.pw(config)
-    return
+
 
 def runner(project_name,iteration,file_names,calculation,qe_path,ncore):
     pre = f'''QE={qe_path}
