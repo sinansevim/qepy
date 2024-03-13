@@ -8,14 +8,13 @@ from . import structure
 class pw:
     def __init__(self,project_id):
         self.project_id = project_id
-        self.config = utils.configure_pw()
+        self.config = utils.configure('pw')
         self.atom = False
         self.lattice = False
         self.calculation=False
         self.job_id = 'results'
         self.path = False
         self.poscar= False
-
 
     def from_poscar(self,directory):
         self.poscar=directory
@@ -28,11 +27,10 @@ class pw:
         self.config['control']['calculation'] = calculation_type
 
 
-    def create_input(self,job_id='results',layer="False"):
-        self.job_id = job_id
+    def create_input(self,layer="False"):
         generate.pw_input(project_id=self.project_id,calculation=self.calculation,job_id=self.job_id, config=self.config,layer=layer)
     
-    def calculate(self,num_core=1):
+    def calculate(self, num_core=1):
         compute.run_pw(self.project_id,self.job_id,self.calculation,num_core)
     def band_points(self,path,number):
         self.path=path
@@ -79,10 +77,39 @@ class pw:
         self.points=kpoints
         return kpoints
     
+    def vc_relax(self,num_core=1): #Crystal optimization
+        self.set_calculation(calculation_type='vc-relax') #set calculation
+        self.create_input() #create input
+        self.calculate(num_core) #run calculation
+    
+    def relax(self,num_core=1,layer=False): #Atomic optimization
+        self.set_calculation(calculation_type='relax') #set calculation
+        self.create_input(layer=layer) #create mono-layer input
+        self.calculate(num_core) #run calculation
+
+    def scf(self,num_core=1): #Scf calculation
+        self.set_calculation(calculation_type='scf') #set calculation
+        self.create_input() #create input
+        self.calculate(num_core) #run calculation
+    def bands(self,path,num_points,num_core): #Band calculation
+        self.band_points(path,num_points) #define path
+        self.set_calculation(calculation_type='bands') #set calculation
+        self.create_input() #create input
+        self.calculate(num_core) #run calculations
+        self.set_calculation('bands-pp') #set calculaion
+        self.create_input() #create input
+        self.calculate( ) #run calculation
+    def test(self,parameter,start,end,step,num_core,debug=False):
+        if parameter=='ecutwfc':
+            result = utils.test_ecutwfc(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
+        elif parameter=='kpoints':
+            result = utils.test_k(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
+        return result
+
 class ph:
     def __init__(self,project_id):
         self.project_id = project_id
-        self.config = utils.configure_ph()
+        self.config = utils.configure('ph')
         self.job_id = 'results'
         self.calculation = False
     def create_input(self,job_id='results'):
@@ -90,8 +117,8 @@ class ph:
         generate.ph_input(project_id=self.project_id,calculation=self.calculation,job_id=self.job_id, config=self.config)
     def set_calculation(self,calculation):
         self.calculation=calculation
-        self.config = utils.configure_ph(calculation)
-    def calculate(self,num_core=1):
+        self.config = utils.configure(calculation)
+    def calculate(self, num_core=1):
         compute.run_ph(self.project_id,self.job_id,self.calculation,num_core)
     def set_q(self,nq1=2,nq2=2,nq3=2):
         self.config['inputph']['nq1']=nq1

@@ -60,25 +60,11 @@ def get_total_energy(path):
     en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
     return(en)
 
-def configure_pw():
-    config_path = './pw_default.json'
-    with open(config_path) as f:
+def configure(calculation,path="./config.json"):
+    with open(path) as f:
         data = f.read()
         config = json.loads(data)
-    return config
-
-def configure_ph(calculation='ph'):
-    if calculation == 'ph':
-        config_path = './ph_default.json'
-    elif calculation == 'q2r':
-        config_path = './q2r_default.json'
-    elif calculation == 'matdyn':
-        config_path = './matdyn_default.json'
-    with open(config_path) as f:
-        data = f.read()
-        config = json.loads(data)
-    return config
-
+    return config[calculation]
 
 def afm_maker(atom,afm_matrix):
     # afm_matrix = [['u','u','d','d'],['u','d','u','d'],['u','d','d','u']]
@@ -104,3 +90,54 @@ def default_pseudo(atom):
 def atom_type(atom):
     num_type = len(list(set([a[0] for a in atom])))
     return num_type
+
+
+def test_ecutwfc(self,start,end,step,num_core,debug=False):
+    #Test ecutwfc
+    parameter = np.arange(start,end,step)
+    result = np.zeros(shape=(3,len(parameter)))
+    for j,i in enumerate(parameter):
+        self.ecutwfc(i)
+        self.job_id=f"ecutwfc_{i}"
+        if debug==False:
+            self.scf(num_core)
+        path = f'./Projects/{self.project_id}/{self.job_id}/scf.out'
+        
+        temp_en = get_total_energy(path)
+        temp_time = get_time(path)
+        result[0][j]=i
+        result[1][j]=temp_en
+        result[2][j]=temp_time
+    return result
+
+def test_k(self,start,end,step,num_core,debug=False):
+    #Test ecutwfc
+    parameter = np.arange(start,end,step)
+    result = np.zeros(shape=(3,len(parameter)))
+    for j,i in enumerate(parameter):
+        self.k_points(int(i))
+        self.job_id=f"kpoints_{i}"
+        if debug==False:
+            self.scf(num_core)
+        path = f'./Projects/{self.project_id}/{self.job_id}/scf.out'
+        
+        temp_en = get_total_energy(path)
+        temp_time = get_time(path)
+        result[0][j]=i
+        result[1][j]=temp_en
+        result[2][j]=temp_time
+    return result
+
+
+def get_time(path):
+    with open(path, 'r') as data:
+     data = data.read().split()
+     counter = 0 
+     for j,i in enumerate(data):
+        # if i == "PWSCF":
+        #     counter += 1 
+        #     if counter ==3:
+        #                         # print(f"CPU: {data[j+2]}, WALL: {data[j+4]}")
+        #                         return (data[j+4])
+        if i=='End':
+           return(data[j-2])

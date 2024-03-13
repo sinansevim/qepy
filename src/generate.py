@@ -22,22 +22,26 @@ def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, in
 
     #Create directory for input files
     try:
-        os.makedirs(f'./{project_id}')
-        os.makedirs(f'./{project_id}/{job_id}')
+        os.makedirs(f'./Projects/')
+    except:
+        pass
+    try:
+        os.makedirs(f'./Projects/{project_id}')
+        os.makedirs(f'./Projects/{project_id}/{job_id}')
     except:
         try:
-            os.makedirs(f'./{project_id}/{job_id}')
+            os.makedirs(f'./Projects/{project_id}/{job_id}')
         except:
             pass
 
     
     # Set parameters from input
-    config["file_path"] = f"./{project_id}/{job_id}/{calculation}.in"
+    config["file_path"] = f"./Projects/{project_id}/{job_id}/{calculation}.in"
 
     #If degauss is given explicitly use it instead
     if(degauss!=None):
         config["system"]["degauss"] = degauss
-    config["control"]["outdir"] = f"./{project_id}/{job_id}/"
+    config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
     # nat = int(config["system"]['nat'])
     
 
@@ -59,7 +63,7 @@ def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, in
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
         try:
-            cell, atoms = reads.read_vc_relax(f"./{project_id}/{job_id}/vc-relax.out")
+            cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
         except:
             try:
                 cell, atoms = config['cell_parameters'], config['atomic_positions']
@@ -71,9 +75,9 @@ def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, in
         if poscar != None:
             cell, atoms = reads.read_poscar(f'{poscar}')
         try:
-            cell, atoms = reads.read_vc_relax(f"./{project_id}/{job_id}/vc-relax.out")
+            cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
             try:
-                atoms = reads.read_relax(f"./{project_id}/{job_id}/relax.out")
+                atoms = reads.read_relax(f"./Projects/{project_id}/{job_id}/relax.out")
             except:
                 pass
         except:
@@ -129,19 +133,19 @@ def ph_input(project_id,calculation,job_id='default',config=False):
     if config==False:
         config = utils.configure_ph()
     # Set parameters from input
-    config["file_path"] = f"./{project_id}/{job_id}/{calculation}.in"
+    config["file_path"] = f"./Projects/{project_id}/{job_id}/{calculation}.in"
     if calculation == 'ph':
-        config["inputph"]["outdir"] = f"./{project_id}/{job_id}/"
+        config["inputph"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
         config["inputph"]['prefix'] = job_id
-        config["inputph"]["fildyn"]= f'./{project_id}/{job_id}/{job_id}.dyn'
+        config["inputph"]["fildyn"]= f'./Projects/{project_id}/{job_id}/{job_id}.dyn'
         scaffold.ph(config)
     elif calculation == 'q2r':
-        config['input']['fildyn'] = f'./{project_id}/{job_id}/{job_id}.dyn'
-        config['input']['flfrc']  = f'./{project_id}/{job_id}/{job_id}.fc'
+        config['input']['fildyn'] = f'./Projects/{project_id}/{job_id}/{job_id}.dyn'
+        config['input']['flfrc']  = f'./Projects/{project_id}/{job_id}/{job_id}.fc'
         scaffold.q2r(config)
     elif calculation == 'matdyn':
-        config['input']['flfrq'] = f'./{project_id}/{job_id}/{job_id}.freq'
-        config['input']['flfrc']  = f'./{project_id}/{job_id}/{job_id}.fc'
+        config['input']['flfrq'] = f'./Projects/{project_id}/{job_id}/{job_id}.freq'
+        config['input']['flfrc']  = f'./Projects/{project_id}/{job_id}/{job_id}.fc'
         scaffold.matdyn(config)
     elif calculation == 'plotband':
         scaffold.plotband(config)

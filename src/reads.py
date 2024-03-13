@@ -86,7 +86,7 @@ def read_efermi(path):
             return e_fermi
 
 def read_num_bands(self):
-    directory = f"./{self.project_id}/{self.job_id}/scf.out"
+    directory = f"./Projects/{self.project_id}/{self.job_id}/scf.out"
     lines = open(directory, 'r').readlines()
     number = 0
     for i in lines:
