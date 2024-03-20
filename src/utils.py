@@ -6,6 +6,7 @@ import re
 import subprocess
 import json
 import qcelemental as qcel
+import untangle
 
 
 def make_monolayer(atoms):
@@ -55,9 +56,11 @@ def plot_sigma_energy(path):
     plt.savefig('total_sigma.png')
 
 def get_total_energy(path):
-    p = subprocess.Popen(f"grep '!' {path}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    line = p.stdout.readlines()[0].decode()
-    en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
+    obj = untangle.parse(path)
+    en = float(obj.qes_espresso.output.total_energy.etot.cdata)*2
+    # p = subprocess.Popen(f"grep '!' {path}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    # line = p.stdout.readlines()[0].decode()
+    # en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
     return(en)
 
 def configure(calculation,path="./config.json"):
@@ -92,52 +95,48 @@ def atom_type(atom):
     return num_type
 
 
-def test_ecutwfc(self,start,end,step,num_core,debug=False):
-    #Test ecutwfc
+def test_parameter(self,parameter_name,conv_thr,start,end,step,num_core,debug=False,out=False):
     parameter = np.arange(start,end,step)
     result = np.zeros(shape=(3,len(parameter)))
+    end=0
     for j,i in enumerate(parameter):
-        self.ecutwfc(i)
-        self.job_id=f"ecutwfc_{i}"
+        if parameter_name=="ecutwfc":
+            self.ecutwfc(i)
+            self.job_id=f"ecutwfc_{i}"
+        if parameter_name=="kpoints":
+            self.k_points(int(i))
+            self.job_id=f"kpoints_{i}"
         if debug==False:
             self.scf(num_core)
-        path = f'./Projects/{self.project_id}/{self.job_id}/scf.out'
-        
+        path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
         temp_en = get_total_energy(path)
         temp_time = get_time(path)
-        result[0][j]=i
-        result[1][j]=temp_en
-        result[2][j]=temp_time
-    return result
-
-def test_k(self,start,end,step,num_core,debug=False):
-    #Test ecutwfc
-    parameter = np.arange(start,end,step)
-    result = np.zeros(shape=(3,len(parameter)))
-    for j,i in enumerate(parameter):
-        self.k_points(int(i))
-        self.job_id=f"kpoints_{i}"
-        if debug==False:
-            self.scf(num_core)
-        path = f'./Projects/{self.project_id}/{self.job_id}/scf.out'
-        
-        temp_en = get_total_energy(path)
-        temp_time = get_time(path)
-        result[0][j]=i
-        result[1][j]=temp_en
-        result[2][j]=temp_time
-    return result
+        result[0][j]=i #parameters
+        result[1][j]=temp_en #energy
+        result[2][j]=temp_time #time
+        end+=1
+        if j!=0:
+            if out==True:
+                print(f"{parameter_name}: {result[0][j]}     DeltaE :{(result[1][j]-result[1][j-1])} Ry    Time: {result[2][j]} seconds")
+            if abs(result[1][j-1] - result[1][j]) < conv_thr:
+                end=j
+                break
+    # print(result.T[:end+1].T)
+    return result.T[:end+1].T
 
 
 def get_time(path):
-    with open(path, 'r') as data:
-     data = data.read().split()
-     counter = 0 
-     for j,i in enumerate(data):
-        # if i == "PWSCF":
-        #     counter += 1 
-        #     if counter ==3:
-        #                         # print(f"CPU: {data[j+2]}, WALL: {data[j+4]}")
-        #                         return (data[j+4])
-        if i=='End':
-           return(data[j-2])
+    obj = untangle.parse(path)
+    time = float(obj.qes_espresso.timing_info.total.wall.cdata)
+    return time
+    # with open(path, 'r') as data:
+    #  data = data.read().split()
+    #  counter = 0 
+    #  for j,i in enumerate(data):
+    #     # if i == "PWSCF":
+    #     #     counter += 1 
+    #     #     if counter ==3:
+    #     #                         # print(f"CPU: {data[j+2]}, WALL: {data[j+4]}")
+    #     #                         return (data[j+4])
+    #     if i=='End':
+    #        return(data[j-2])
