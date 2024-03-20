@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 def read_pp(paths):
     elements = []
@@ -93,3 +94,21 @@ def read_num_bands(self):
         if "    number of Kohn-Sham states" in i:
             number = float(i.split()[-1])
             return number
+        
+
+def read_json(data=False,path=False):
+    if (path):
+        with open(path) as f:
+            data = f.read()
+    crystal = json.loads(data)
+    atoms = []
+    cell = np.array(crystal['lattice']['matrix'],dtype=str)
+    for i in range(len(crystal['sites'])):
+        element = crystal['sites'][i]['species'][0]['element']
+        coordinate = crystal['sites'][i]['abc']
+        atoms.append([element,str(coordinate[0]),str(coordinate[1]),str(coordinate[2])])
+        # atoms.append(element)
+        # coordinate = crystal['sites'][i]['abc']
+        # positions[i]={element:coordinate}
+    return cell,atoms
+ 
