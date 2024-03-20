@@ -44,6 +44,7 @@ from .getpaths import (
 
 from .hpkot import EdgeCaseWarning, SymmetryDetectionError
 from .brillouinzone import brillouinzone
+from . import hpkot
 
 __all__ = (
     "get_path",
