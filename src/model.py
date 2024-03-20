@@ -22,6 +22,11 @@ class pw:
         self.config['atomic_positions'] = atom
         self.config['cell_parameters'] = lattice
     
+    def from_json(self,data=False,path=False):
+        lattice, atom = reads.read_json(data=data,path=path)
+        self.config['atomic_positions'] = atom
+        self.config['cell_parameters'] = lattice
+    
     def set_calculation(self,calculation_type):
         self.calculation = calculation_type
         self.config['control']['calculation'] = calculation_type
@@ -99,11 +104,12 @@ class pw:
         self.set_calculation('bands-pp') #set calculaion
         self.create_input() #create input
         self.calculate( ) #run calculation
-    def test(self,parameter,start,end,step,num_core,debug=False):
-        if parameter=='ecutwfc':
-            result = utils.test_ecutwfc(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
-        elif parameter=='kpoints':
-            result = utils.test_k(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
+    def test(self,parameter_name,conv_thr,start,end,step,num_core,debug=False,out=False):
+        result = utils.test_parameter(self=self,parameter_name=parameter_name,conv_thr=conv_thr,start=start,end=end,step=step,num_core=num_core,debug=debug,out=out)
+        # if parameter=='ecutwfc':
+        #     result = utils.test_ecutwfc(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
+        # elif parameter=='kpoints':
+        #     result = utils.test_k(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
         return result
 
 class ph:
