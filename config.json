@@ -1,7 +1,7 @@
 {
   "pw": {
     "control": {
-      "pseudo_dir": "./pseudos/"
+      "pseudo_dir": "./pseudos/NC"
     },
     "system": {
       "degauss": "0.1",
