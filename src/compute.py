@@ -7,6 +7,7 @@ def run_pw(project_id,job_id,calculation,num_core):
     else:
         p = subprocess.Popen(f"mpirun -np {num_core}  -allow-run-as-root pw.x -inp ./Projects/{project_id}/{job_id}/{calculation}.in > ./Projects/{project_id}/{job_id}/{calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         p.wait()
+    print(f'{calculation} is finished')
 
 def run_ph(project_id,job_id,calculation,num_core):
     if calculation == 'ph':
