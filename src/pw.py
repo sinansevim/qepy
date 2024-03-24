@@ -5,6 +5,9 @@ from . import compute
 from . import kpoints
 from . import plots
 from . import structure
+
+
+
 class pw:
     def __init__(self,project_id):
         self.project_id = project_id
@@ -16,9 +19,13 @@ class pw:
         self.path = False
         self.poscar= False
 
-    def from_poscar(self,directory):
-        self.poscar=directory
-        lattice, atom = reads.read_poscar(directory)
+    def from_poscar(self,directory=False):
+        if directory==False:
+            self.poscar=f'./Structures/{self.project_id}.poscar'
+            lattice, atom = reads.read_poscar(self.poscar)
+        else:
+            self.poscar=directory
+            lattice, atom = reads.read_poscar(directory)
         self.config['atomic_positions'] = atom
         self.config['cell_parameters'] = lattice
     
@@ -30,10 +37,15 @@ class pw:
     def set_calculation(self,calculation_type):
         self.calculation = calculation_type
         self.config['control']['calculation'] = calculation_type
-
+    def set_pseudo(self,pseudo_type):
+        self.config['control']['pseudo_dir']='./pseudos/'+pseudo_type
+    
+    def make_afm(self,magnetic_atom):
+        afm_models = utils.afm_maker(self,magnetic_atom)
+        return afm_models
 
     def create_input(self,layer="False"):
-        generate.pw_input(project_id=self.project_id,calculation=self.calculation,job_id=self.job_id, config=self.config,layer=layer)
+        generate.pw_input(project_id=self.project_id,calculation=self.calculation,job_id=self.job_id, config=self.config,layer=layer,pseudo=False)
     
     def calculate(self, num_core=1):
         compute.run_pw(self.project_id,self.job_id,self.calculation,num_core)
@@ -47,7 +59,9 @@ class pw:
         self.config['system']['ecutwfc'] = number
     def conv_thr(self,number):
         self.config['electrons']['conv_thr']=number
-
+    def make_layer(self,layer_type):
+        if layer_type=='mono':
+            self.config['atomic_positions'] = utils.make_monolayer(self.config['atomic_positions'])
     def k_points(self,number):
         if type(number) == int :
             self.config['k_points']=f'{number} {number} {number} 0 0 0'
@@ -81,15 +95,19 @@ class pw:
         lattice,atoms,kpoints = structure.primitive(self.poscar,file)
         self.points=kpoints
         return kpoints
-    
+    def get_structure(self,format,name=False,project_id=False,job_id=False,config=False):
+        if format=="poscar":
+            self.poscar=f'./Structures/{self.project_id}.poscar'
+        reads.read_structure(format,name=False,project_id=self.project_id,job_id=self.job_id,config=self.config)
+
     def vc_relax(self,num_core=1): #Crystal optimization
         self.set_calculation(calculation_type='vc-relax') #set calculation
         self.create_input() #create input
         self.calculate(num_core) #run calculation
     
-    def relax(self,num_core=1,layer=False): #Atomic optimization
+    def relax(self,num_core=1): #Atomic optimization
         self.set_calculation(calculation_type='relax') #set calculation
-        self.create_input(layer=layer) #create mono-layer input
+        self.create_input() #create mono-layer input
         self.calculate(num_core) #run calculation
 
     def scf(self,num_core=1): #Scf calculation
@@ -104,39 +122,10 @@ class pw:
         self.set_calculation('bands-pp') #set calculaion
         self.create_input() #create input
         self.calculate( ) #run calculation
-    def test(self,parameter_name,conv_thr,start,end,step,num_core,debug=False,out=False):
+    def test(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False):
         result = utils.test_parameter(self=self,parameter_name=parameter_name,conv_thr=conv_thr,start=start,end=end,step=step,num_core=num_core,debug=debug,out=out)
         # if parameter=='ecutwfc':
         #     result = utils.test_ecutwfc(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
         # elif parameter=='kpoints':
         #     result = utils.test_k(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
         return result
-
-class ph:
-    def __init__(self,project_id):
-        self.project_id = project_id
-        self.config = utils.configure('ph')
-        self.job_id = 'results'
-        self.calculation = False
-    def create_input(self,job_id='results'):
-        # self.set_calculation(self.calculation)
-        generate.ph_input(project_id=self.project_id,calculation=self.calculation,job_id=self.job_id, config=self.config)
-    def set_calculation(self,calculation):
-        self.calculation=calculation
-        self.config = utils.configure(calculation)
-    def calculate(self, num_core=1):
-        compute.run_ph(self.project_id,self.job_id,self.calculation,num_core)
-    def set_q(self,nq1=2,nq2=2,nq3=2):
-        self.config['inputph']['nq1']=nq1
-        self.config['inputph']['nq2']=nq2
-        self.config['inputph']['nq3']=nq3
-    def set_path(self, path,number,poscar=True):
-        model = pw(project_id=self.project_id )
-        if (poscar):
-            model.from_poscar(directory=f"{self.project_id}.poscar")
-        model.band_points(path,number)
-        kpt = model.config['k_points_bands']
-        self.config['k_points_bands']=kpt
-    def plot(self):
-        plots.plot_phonon(self)
-
