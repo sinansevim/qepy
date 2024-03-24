@@ -7,6 +7,8 @@ import subprocess
 import json
 import qcelemental as qcel
 import untangle
+import copy
+import math
 
 
 def make_monolayer(atoms):
@@ -69,16 +71,35 @@ def configure(calculation,path="./config.json"):
         config = json.loads(data)
     return config[calculation]
 
-def afm_maker(atom,afm_matrix):
-    # afm_matrix = [['u','u','d','d'],['u','d','u','d'],['u','d','d','u']]
-    afm =[]
-    for i in range(len(afm_matrix)):
-        # print(f"AFM{i}")
-        afm.append(np.array(atom).copy())
-        for j in range(4):
-                afm[i][j][0]=atom[j][0]+afm_matrix[i][j]
-                # print(afm[i][j][0])
-    return afm
+def afm_maker(model,magnetic_atom,mag_start=[1,-1]):
+    models=[] #initialize models
+    atom_index=[] #intialize atom index
+    for j,i in enumerate(model.config['atomic_positions']): #iterate over atomic positions
+        if i[0]==magnetic_atom: #select magnetic atoms
+            atom_index.append(j) #add magnetic atoms index to the array
+    number = len(atom_index) # check for magnetic atom number
+    if number ==2: #if there are 2
+        spin_matrix = [[1,0]] #use this one
+    else: #otherwise
+        num_config = int(math.factorial(number)/(math.factorial(number-int(number/2))*math.factorial(int(number/2)))/2) #some combinations
+        one = np.ones(num_config).T.reshape(num_config,1) #keep the first atom up
+        id = np.identity(num_config) #create other atom combinations
+        spin_matrix = np.concatenate((one,id), axis=1) #combine them
+    for j,i in enumerate(model.config['atomic_species']): #for each atom
+        if i['atom']==magnetic_atom: # choose magnetic atom
+           i['atom']=i['atom']+str(int(1)) #change the name atom atom1
+           model.config['system'][f'starting_magnetization({j+1})']=mag_start[0]
+           model.config['atomic_species'].append(copy.deepcopy(i)) #create the same atom
+    model.config['atomic_species'][-1]['atom']=magnetic_atom+str(int(0)) #change name to atom0
+    model.config['system']['nspin']=2
+    ntype = len(model.config['atomic_species'])
+    model.config['system'][f'starting_magnetization({ntype})']=mag_start[1]
+    for spin_config in spin_matrix: #for each configuration of spin matirx
+        temp_model = copy.deepcopy(model) #create a model
+        for j,i in enumerate(atom_index): #for each magnetic atom
+            temp_model.config['atomic_positions'][i][0]=temp_model.config['atomic_positions'][i][0]+str(int(spin_config[j])) #change name with the spin matrix
+        models.append(temp_model) #add to models array
+    return models #send it back
 
 def default_pseudo(atom):
     atom_type = list(set([a[0] for a in atom]))
@@ -95,7 +116,7 @@ def atom_type(atom):
     return num_type
 
 
-def test_parameter(self,parameter_name,conv_thr,start,end,step,num_core,debug=False,out=False):
+def test_parameter(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False):
     parameter = np.arange(start,end,step)
     result = np.zeros(shape=(3,len(parameter)))
     end=0
@@ -106,6 +127,9 @@ def test_parameter(self,parameter_name,conv_thr,start,end,step,num_core,debug=Fa
         if parameter_name=="kpoints":
             self.k_points(int(i))
             self.job_id=f"kpoints_{i}"
+        if parameter_name=="num_core":
+            self.job_id=f"num_core_{i}"
+            num_core = i
         if debug==False:
             self.scf(num_core)
         path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
@@ -117,10 +141,17 @@ def test_parameter(self,parameter_name,conv_thr,start,end,step,num_core,debug=Fa
         end+=1
         if j!=0:
             if out==True:
-                print(f"{parameter_name}: {result[0][j]}     DeltaE :{(result[1][j]-result[1][j-1])} Ry    Time: {result[2][j]} seconds")
-            if abs(result[1][j-1] - result[1][j]) < conv_thr:
-                end=j
-                break
+                if parameter_name=="num_core":
+                    print(f"{parameter_name}: {result[0][j]}     DeltaT :{(result[2][j]-result[2][j-1])} seconds    Time: {result[2][j]} seconds")
+                else:
+                    print(f"{parameter_name}: {result[0][j]}     DeltaE :{(result[1][j]-result[1][j-1])} seconds    Time: {result[2][j]} seconds")
+            if conv_thr!=False:
+                if abs(result[1][j-1] - result[1][j]) < conv_thr:
+                    end=j
+                    break
+        else:
+            print(f"{parameter_name}: {result[0][j]}      Time: {result[2][j]} seconds")
+
     # print(result.T[:end+1].T)
     return result.T[:end+1].T
 
