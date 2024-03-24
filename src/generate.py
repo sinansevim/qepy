@@ -1,25 +1,12 @@
 from . import scaffold
 from . import reads
 from . import utils
+from . import check
 import os
 import sys
 
 
-def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False,pseudo=False):
-    
-    #Check file name, if it is None, uses degauss instead
-    if (not job_id):
-        if (degauss):
-            job_id = degauss
-        else:
-            # sys.stdout.writelines("No file name \n")
-            # print("No file name")
-             raise Exception("Define a job_id")
-    
-    #Default config
-    if config==False:
-        config = utils.configure_pw()
-
+def create_folders(project_id,job_id):
     #Create directory for input files
     try:
         os.makedirs(f'./Projects/')
@@ -34,75 +21,72 @@ def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, in
         except:
             pass
 
+def pw_input(project_id=False, calculation=False,config=False, degauss=None, job_id=False, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False,pseudo=False):
+    check.project_id(project_id)
+    check.job_id(job_id)
+    check.config(config)
     
-    # Set parameters from input
+    # Set outfolders
+    create_folders(project_id=project_id,job_id=job_id)
     config["file_path"] = f"./Projects/{project_id}/{job_id}/{calculation}.in"
-
-    #If degauss is given explicitly use it instead
-    if(degauss!=None):
-        config["system"]["degauss"] = degauss
     config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
-    # nat = int(config["system"]['nat'])
     
 
     
 
-    if calculation == 'vc-relax':
-        # Import initial cell and atom parameters
-        if poscar != None:
-            cell, atoms = reads.read_poscar(f'{poscar}')
-        elif initial_guess != None:
-            cell, atoms = reads.read_vc_relax(f"{initial_guess}")
-        else:
-            try:
-                cell, atoms = config['cell_parameters'], config['atomic_positions']
-            except:
-                raise Exception("PLease enter atomic position and lattice constants")
+    # if calculation == 'vc-relax':
+    #     # Import initial cell and atom parameters
+    #     if poscar != None:
+    #         cell, atoms = reads.read_poscar(f'{poscar}')
+    #     elif initial_guess != None:
+    #         cell, atoms = reads.read_vc_relax(f"{initial_guess}")
+    #     else:
+    #         try:
+    #             cell, atoms = config['cell_parameters'], config['atomic_positions']
+    #         except:
+    #             raise Exception("PLease enter atomic position and lattice constants")
 
-    elif calculation == 'relax':
-        if poscar != None:
-            cell, atoms = reads.read_poscar(f'{poscar}')
-        try:
-            cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
-        except:
-            try:
-                cell, atoms = config['cell_parameters'], config['atomic_positions']
-            except:
-                raise Exception("PLease enter atomic position and lattice constants")
-
-
-    else:
-        if poscar != None:
-            cell, atoms = reads.read_poscar(f'{poscar}')
-        try:
-            cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
-            try:
-                atoms = reads.read_relax(f"./Projects/{project_id}/{job_id}/relax.out")
-            except:
-                pass
-        except:
-            try:
-                cell, atoms = config['cell_parameters'], config['atomic_positions']
-            except:
-                raise Exception("PLease enter atomic position and lattice constants")
-
-    if(layer=='mono'):
-            atoms = utils.make_monolayer(atoms)
-
-    if k_points != None:
-        config['k_points'] = k_points
-
-    if(lattice_constant):
-        cell=lattice_constant
-    if(atomic_positions):
-        atoms=atomic_positions
+    # elif calculation == 'relax':
+    #     if poscar != None:
+    #         cell, atoms = reads.read_poscar(f'{poscar}')
+    #     try:
+    #         cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
+    #     except:
+    #         try:
+    #             cell, atoms = config['cell_parameters'], config['atomic_positions']
+    #         except:
+    #             raise Exception("PLease enter atomic position and lattice constants")
 
 
+    # else:
+    #     if poscar != None:
+    #         cell, atoms = reads.read_poscar(f'{poscar}')
+    #     try:
+    #         cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
+    #         try:
+    #             atoms = reads.read_relax(f"./Projects/{project_id}/{job_id}/relax.out")
+    #         except:
+    #             pass
+    #     except:
+    #         try:
+    #             cell, atoms = config['cell_parameters'], config['atomic_positions']
+    #         except:
+    #             raise Exception("PLease enter atomic position and lattice constants")
+
+    # if(layer=='mono'):
+    #         atoms = utils.make_monolayer(atoms)
+
+    # # if k_points != None:
+    # #     config['k_points'] = k_points
+
+    # if(lattice_constant):
+    #     cell=lattice_constant
+    # if(atomic_positions):
+    #     atoms=atomic_positions
 
 
-    #Check for pseudopotentials
-    if pseudo==False:
-        config['atomic_species']=utils.default_pseudo(atoms)
+    cell, atoms = config['cell_parameters'], config['atomic_positions']
+
 
     config["control"]['prefix'] = job_id
     config["system"]['nat'] = len(atoms)
@@ -117,8 +101,8 @@ def pw_input(project_id, calculation,config=False, degauss=None, job_id=None, in
         config["system"]['ibrav']
     except:
         config["system"]['ibrav'] = 0
-    config['atomic_positions'] = atoms
-    config['cell_parameters'] = cell
+    # config['atomic_positions'] = atoms
+    # config['cell_parameters'] = cell
     config["control"]['calculation'] = calculation
 
     if calculation == 'bands-pp':
