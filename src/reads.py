@@ -1,6 +1,26 @@
 import numpy as np
 import json
+from . import utils
 
+def read_structure(format,name=False,project_id=False,job_id=False,config=False):
+    if format.lower()=='poscar':
+        if not name:
+            name=project_id
+        cell,atom = read_poscar(f"./Structures/{name}.poscar")  
+    if format.lower()=='vc-relax':
+        cell, atom = read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
+    if format.lower()=='relax':
+        atom = read_relax(f"./Projects/{project_id}/{job_id}/relax.out")
+    try:
+        config['cell_parameters'], config['atomic_positions'] = cell,atom
+    except:
+        try:
+            config['atomic_positions'] = atom
+        except:
+            return cell,atom
+    config['atomic_species']=utils.default_pseudo(atom)
+    # print(cell,atom)
+        
 def read_pp(paths):
     elements = []
     wavefunction = []
@@ -38,8 +58,14 @@ def read_poscar(path):
     for i in data[8:]:
         line=(i.split())
         position=line[:3] 
-        atom = [line[-1]]
-        atoms.append(atom+position)
+        atom = line[-1]
+        for j in atom:
+            try:
+                int(j)
+                atom = atom[:-2]
+            except:
+                pass
+        atoms.append([atom]+position)
     return(cell,atoms)
     
         
