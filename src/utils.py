@@ -151,7 +151,7 @@ def test_parameter(self,parameter_name,start,end,step,conv_thr=False,num_core=1,
         if debug==False:
             self.scf(num_core)
         temp_en = get_total_energy(self)
-        temp_time = get_time(path)
+        temp_time = get_time(self)
         result[0][j]=i #parameters
         result[1][j]=temp_en #energy
         result[2][j]=temp_time #time
