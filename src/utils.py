@@ -173,7 +173,8 @@ def test_parameter(self,parameter_name,start,end,step,conv_thr=False,num_core=1,
     return result.T[:end+1].T
 
 
-def get_time(path):
+def get_time(self):
+    path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
     obj = untangle.parse(path)
     time = float(obj.qes_espresso.timing_info.total.wall.cdata)
     return time
