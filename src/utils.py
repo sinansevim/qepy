@@ -57,7 +57,8 @@ def plot_sigma_energy(path):
     plt.yticks(fontsize=20)
     plt.savefig('total_sigma.png')
 
-def get_total_energy(path):
+def get_total_energy(self):
+    path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
     obj = untangle.parse(path)
     en = float(obj.qes_espresso.output.total_energy.etot.cdata)*2
     # p = subprocess.Popen(f"grep '!' {path}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -72,6 +73,17 @@ def configure(calculation,path="./config.json"):
     return config[calculation]
 
 def afm_maker(model,magnetic_atom,mag_start=[1,-1]):
+    #1 - Give initial model
+    #2 - Define magnetic atom
+    #3 - Return magnetic states
+    #4 - FM and AFM
+
+    """
+    FM is easier to do. Only starting magnetization parameter should be added for the relevent atom
+    Number of AFM states can be changing depending on the number of magnetic atoms. 
+    The number of magnetic atoms should be divided into two for spin up and down. 
+    Total magnetism is going to be zero but the order of spins are going to be change.
+    """
     models=[] #initialize models
     atom_index=[] #intialize atom index
     for j,i in enumerate(model.config['atomic_positions']): #iterate over atomic positions
@@ -105,7 +117,13 @@ def default_pseudo(atom):
     atom_type = list(set([a[0] for a in atom]))
     atom_array = []
     for i in atom_type:
-        temp_atom = {"atom":i,'mass':str(qcel.periodictable.to_mass(i)),'pseudopotential':f"{i}.UPF"}
+        for j in i:
+            try:
+                int(j)
+                k=i[:-1]
+            except:
+                k=i
+        temp_atom = {"atom":i,'mass':str(qcel.periodictable.to_mass(k)),'pseudopotential':f"{k}.UPF"}
         atom_array.append(temp_atom)
         # print(temp_atom)
     # print(atom_array)  
@@ -132,8 +150,7 @@ def test_parameter(self,parameter_name,start,end,step,conv_thr=False,num_core=1,
             num_core = i
         if debug==False:
             self.scf(num_core)
-        path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
-        temp_en = get_total_energy(path)
+        temp_en = get_total_energy(self)
         temp_time = get_time(path)
         result[0][j]=i #parameters
         result[1][j]=temp_en #energy

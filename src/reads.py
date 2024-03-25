@@ -19,6 +19,26 @@ def read_structure(format,name=False,project_id=False,job_id=False,config=False)
         except:
             return cell,atom
     config['atomic_species']=utils.default_pseudo(atom)
+
+    #Check magnetic atoms order 
+    for k,i in enumerate(config['atomic_species']):
+        for j in i['atom']:
+            try:
+                del config['system'][f'starting_magnetization({k+1})']
+            except:
+                pass
+            # print(j)
+            try:
+                int(j)
+                if int(j)==0:
+                    config['system'][f'starting_magnetization({k+1})']=-1
+                elif int(j)==1:
+                    config['system'][f'starting_magnetization({k+1})']=1
+                
+            except:
+                pass
+
+
     # print(cell,atom)
         
 def read_pp(paths):
