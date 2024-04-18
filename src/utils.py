@@ -72,7 +72,7 @@ def configure(calculation,path="./config.json"):
         config = json.loads(data)
     return config[calculation]
 
-def afm_maker(model,magnetic_atom,mag_start=[1,-1]):
+def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
     #1 - Give initial model
     #2 - Define magnetic atom
     #3 - Return magnetic states
@@ -93,7 +93,7 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1]):
     if number ==2: #if there are 2
         spin_matrix = [[1,0]] #use this one
     else: #otherwise
-        num_config = int(math.factorial(number)/(math.factorial(number-int(number/2))*math.factorial(int(number/2)))/2) #some combinations
+        num_config = int(math.factorial(number)/(math.factorial(number-int(number/2))*math.factorial(int(number/2)))/2) #choose N/2 of N divide by 2
         one = np.ones(num_config).T.reshape(num_config,1) #keep the first atom up
         id = np.identity(num_config) #create other atom combinations
         spin_matrix = np.concatenate((one,id), axis=1) #combine them
@@ -101,6 +101,12 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1]):
         if i['atom']==magnetic_atom: # choose magnetic atom
            i['atom']=i['atom']+str(int(1)) #change the name atom atom1
            model.config['system'][f'starting_magnetization({j+1})']=mag_start[0]
+           if (angle1):
+            model.config['system'][f'angle1({j+1})']=angle1
+           if (angle2):
+            model.config['system'][f'angle2({j+1})']=angle2
+            if angle1 or angle2:
+                model.config['system']['noncolin']='true'
            model.config['atomic_species'].append(copy.deepcopy(i)) #create the same atom
     model.config['atomic_species'][-1]['atom']=magnetic_atom+str(int(0)) #change name to atom0
     model.config['system']['nspin']=2

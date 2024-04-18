@@ -43,8 +43,8 @@ class pw:
     def set_pseudo(self,pseudo_type):
         self.config['control']['pseudo_dir']='./pseudos/'+pseudo_type.upper()+'/'
     
-    def make_afm(self,magnetic_atom):
-        afm_models = utils.afm_maker(self,magnetic_atom)
+    def make_afm(self,magnetic_atom,angle1=False,angle2=False):
+        afm_models = utils.afm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
         return afm_models
 
     def create_input(self,layer="False"):
