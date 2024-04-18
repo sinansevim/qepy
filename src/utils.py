@@ -98,19 +98,23 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
         id = np.identity(num_config) #create other atom combinations
         spin_matrix = np.concatenate((one,id), axis=1) #combine them
     for j,i in enumerate(model.config['atomic_species']): #for each atom
-        if i['atom']==magnetic_atom: # choose magnetic atom
-           i['atom']=i['atom']+str(int(1)) #change the name atom atom1
-           model.config['system'][f'starting_magnetization({j+1})']=mag_start[0]
-           if (angle1):
-            model.config['system'][f'angle1({j+1})']=angle1
-           if (angle2):
-            model.config['system'][f'angle2({j+1})']=angle2
+        if  i['atom']==magnetic_atom: # choose magnetic atom
+            i['atom']=i['atom']+str(int(1)) #change the name atom atom1
+            model.config['system'][f'starting_magnetization({j+1})']=mag_start[0]
+            if (angle1):
+                model.config['system'][f'angle1({j+1})']=angle1
+            if (angle2):
+                model.config['system'][f'angle2({j+1})']=angle2
             if angle1 or angle2:
                 model.config['system']['noncolin']='true'
-           model.config['atomic_species'].append(copy.deepcopy(i)) #create the same atom
+            model.config['atomic_species'].append(copy.deepcopy(i)) #create the same atom
     model.config['atomic_species'][-1]['atom']=magnetic_atom+str(int(0)) #change name to atom0
     model.config['system']['nspin']=2
     ntype = len(model.config['atomic_species'])
+    if (angle1):
+        model.config['system'][f'angle1({ntype})']=angle1
+    if (angle2):
+        model.config['system'][f'angle2({ntype})']=angle2
     model.config['system'][f'starting_magnetization({ntype})']=mag_start[1]
     for spin_config in spin_matrix: #for each configuration of spin matirx
         temp_model = copy.deepcopy(model) #create a model
