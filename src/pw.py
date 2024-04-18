@@ -41,7 +41,7 @@ class pw:
         self.calculation = calculation_type
         self.config['control']['calculation'] = calculation_type
     def set_pseudo(self,pseudo_type):
-        self.config['control']['pseudo_dir']='./pseudos/'+pseudo_type
+        self.config['control']['pseudo_dir']='./pseudos/'+pseudo_type.upper()+'/'
     
     def make_afm(self,magnetic_atom):
         afm_models = utils.afm_maker(self,magnetic_atom)
@@ -99,9 +99,9 @@ class pw:
         self.points=kpoints
         return kpoints
     def get_structure(self,format,name=False,project_id=False,job_id=False,config=False):
-        if format=="poscar":
-            self.poscar=f'./Structures/{self.project_id}.poscar'
-        reads.read_structure(format,name=False,project_id=self.project_id,job_id=self.job_id,config=self.config)
+        # if format=="poscar":
+        #     self.poscar=f'./Structures/{self.project_id}.poscar'
+        reads.read_structure(format,name=name,project_id=self.project_id,job_id=self.job_id,config=self.config)
 
     def vc_relax(self,num_core=1): #Crystal optimization
         self.set_calculation(calculation_type='vc-relax') #set calculation
