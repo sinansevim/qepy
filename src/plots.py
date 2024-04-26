@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from . import reads
 
-def plot_electron(self,ylim=False,show=False,save=False):
-    sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
+def plot_electron(self,ylim=False,show=False,save=True):
+    sym = reads.read_symmetries(f'./Projects/{self.prFalseoject_id}/{self.job_id}/bands-pp.out')
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
     fig = plt.figure(figsize=(8,6))
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
@@ -23,7 +23,7 @@ def plot_electron(self,ylim=False,show=False,save=False):
         return fig
     
 
-def plot_phonon(self):
+def plot_phonon(self,save=True):
     sym = []
     point = [0]
     for k,i in enumerate(self.config['k_points_bands']):
@@ -45,6 +45,7 @@ def plot_phonon(self):
     plt.ylim(0,)
     plt.xlim(0,ph_path[-1])
     plt.ylabel("ω (meV)",fontsize=15)
-    plt.savefig('phonon_band.png')
+    if save==True:
+        plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/phonon_band.png')
     plt.show()
     
