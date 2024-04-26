@@ -60,6 +60,8 @@ class pw:
 
     def ecutwfc(self,number):
         self.config['system']['ecutwfc'] = number
+    def ecutrho(self,number):
+        self.config['system']['ecutrho'] = number
     def conv_thr(self,number):
         self.config['electrons']['conv_thr']=number
     def make_layer(self,layer_type):
@@ -99,8 +101,8 @@ class pw:
         self.points=kpoints
         return kpoints
     def get_structure(self,format,name=False,project_id=False,job_id=False,config=False):
-        # if format=="poscar":
-        #     self.poscar=f'./Structures/{self.project_id}.poscar'
+        if format=="poscar" and not name:
+            self.poscar=f'./Structures/{self.project_id}.poscar'
         reads.read_structure(format,name=name,project_id=self.project_id,job_id=self.job_id,config=self.config)
 
     def vc_relax(self,num_core=1): #Crystal optimization
