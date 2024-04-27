@@ -1,23 +1,6 @@
 import subprocess
 
-def run_pw(project_id,job_id,calculation,num_core):
-    if calculation == 'bands-pp':
-        p = subprocess.Popen(f"mpirun -np {num_core} bands.x -inp ./Projects/{project_id}/{job_id}/{calculation}.in > ./Projects/{project_id}/{job_id}/{calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
-    else:
-        p = subprocess.Popen(f"mpirun -np {num_core} pw.x -inp ./Projects/{project_id}/{job_id}/{calculation}.in > ./Projects/{project_id}/{job_id}/{calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
-    print(f'{calculation} is finished')
-
-
-def run_ph(project_id,job_id,calculation,num_core):
-    if calculation == 'ph':
-        p = subprocess.Popen(f"mpirun -np {num_core} ph.x -inp ./Projects/{project_id}/{job_id}/{calculation}.in > ./Projects/{project_id}/{job_id}/{calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
-    if calculation == 'q2r':
-        p = subprocess.Popen(f"mpirun -np {num_core} q2r.x -inp ./Projects/{project_id}/{job_id}/{calculation}.in > ./Projects/{project_id}/{job_id}/{calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
-    if calculation == 'matdyn':
-        p = subprocess.Popen(f"mpirun -np {num_core} matdyn.x -inp ./Projects/{project_id}/{job_id}/{calculation}.in > ./Projects/{project_id}/{job_id}/{calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
-
+def run(self):
+    p = subprocess.Popen(f"mpirun -np {self.num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p.wait()
+    print(f'{self.calculation} is finished')

@@ -21,70 +21,19 @@ def create_folders(project_id,job_id):
         except:
             pass
 
-def pw_input(project_id=False, calculation=False,config=False, degauss=None, job_id=False, initial_guess=None, k_points=None, poscar=None, layer=None, lattice_constant=False,atomic_positions=False,pseudo=False):
+def pw_checks(self):
+    project_id = self.project_id
+    job_id = self.job_id
+    config=self.config['pw']
+    calculation=self.calculation
     check.project_id(project_id)
     check.job_id(job_id)
     check.config(config)
     
     # Set outfolders
     create_folders(project_id=project_id,job_id=job_id)
-    config["file_path"] = f"./Projects/{project_id}/{job_id}/{calculation}.in"
     config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
     
-
-    
-
-    # if calculation == 'vc-relax':
-    #     # Import initial cell and atom parameters
-    #     if poscar != None:
-    #         cell, atoms = reads.read_poscar(f'{poscar}')
-    #     elif initial_guess != None:
-    #         cell, atoms = reads.read_vc_relax(f"{initial_guess}")
-    #     else:
-    #         try:
-    #             cell, atoms = config['cell_parameters'], config['atomic_positions']
-    #         except:
-    #             raise Exception("PLease enter atomic position and lattice constants")
-
-    # elif calculation == 'relax':
-    #     if poscar != None:
-    #         cell, atoms = reads.read_poscar(f'{poscar}')
-    #     try:
-    #         cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
-    #     except:
-    #         try:
-    #             cell, atoms = config['cell_parameters'], config['atomic_positions']
-    #         except:
-    #             raise Exception("PLease enter atomic position and lattice constants")
-
-
-    # else:
-    #     if poscar != None:
-    #         cell, atoms = reads.read_poscar(f'{poscar}')
-    #     try:
-    #         cell, atoms = reads.read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
-    #         try:
-    #             atoms = reads.read_relax(f"./Projects/{project_id}/{job_id}/relax.out")
-    #         except:
-    #             pass
-    #     except:
-    #         try:
-    #             cell, atoms = config['cell_parameters'], config['atomic_positions']
-    #         except:
-    #             raise Exception("PLease enter atomic position and lattice constants")
-
-    # if(layer=='mono'):
-    #         atoms = utils.make_monolayer(atoms)
-
-    # # if k_points != None:
-    # #     config['k_points'] = k_points
-
-    # if(lattice_constant):
-    #     cell=lattice_constant
-    # if(atomic_positions):
-    #     atoms=atomic_positions
-
-
     cell, atoms = config['cell_parameters'], config['atomic_positions']
 
 
@@ -101,41 +50,46 @@ def pw_input(project_id=False, calculation=False,config=False, degauss=None, job
         config["system"]['ibrav']
     except:
         config["system"]['ibrav'] = 0
-    # config['atomic_positions'] = atoms
-    # config['cell_parameters'] = cell
     config["control"]['calculation'] = calculation
 
-    if calculation == 'bands-pp':
-        scaffold.bands_pp(config)
-    else:
-        scaffold.pw(config)
-    return
+    
 
+def input(self):
+    if self.package=='pw':
+        pw_checks(self)
+    if self.package=='ph':
+        ph_checks(self)
+    if self.package=='q2r':
+        q2r_checks(self)
+    if self.package=='matdyn':
+        matdyn_checks(self)
+    if self.package=='bands':
+        bands_chekcs(self)
+    if self.package=='dos':
+        dos_chekcs(self)
+    scaffold.constructor(self)
 
-def ph_input(project_id,calculation,job_id='default',config=False):
-    #Default config
-    if config==False:
-        config = utils.configure_ph()
-    # Set parameters from input
-    config["file_path"] = f"./Projects/{project_id}/{job_id}/{calculation}.in"
-    if calculation == 'ph':
-        config["inputph"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
-        config["inputph"]['prefix'] = job_id
-        config["inputph"]["fildyn"]= f'./Projects/{project_id}/{job_id}/{job_id}.dyn'
-        scaffold.ph(config)
-    elif calculation == 'q2r':
-        config['input']['fildyn'] = f'./Projects/{project_id}/{job_id}/{job_id}.dyn'
-        config['input']['flfrc']  = f'./Projects/{project_id}/{job_id}/{job_id}.fc'
-        scaffold.q2r(config)
-    elif calculation == 'matdyn':
-        config['input']['flfrq'] = f'./Projects/{project_id}/{job_id}/{job_id}.freq'
-        config['input']['flfrc']  = f'./Projects/{project_id}/{job_id}/{job_id}.fc'
-        scaffold.matdyn(config)
-    elif calculation == 'plotband':
-        scaffold.plotband(config)
-    elif calculation == "ph_plot":
-        scaffold.ph_plot(config)
+def ph_checks(self):
+    self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    self.config['ph']["inputph"]['prefix'] = self.job_id
+    self.config['ph']["inputph"]["fildyn"]= f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.dyn'
+def q2r_checks(self):
+        self.config['q2r']['input']['fildyn'] = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.dyn'
+        self.config['q2r']['input']['flfrc']  = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.fc'
+def matdyn_checks(self):
+        self.config['matdyn']['input']['fildyn'] = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.dyn'
+        self.config['matdyn']['input']['flfrc']  = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.fc'
+        self.config['matdyn']['input']['flfrq']  = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.freq'
+        self.config['matdyn']['input']['flvec']  = f'./Projects/{self.project_id}/{self.job_id}/matdyn.modes'
+def bands_chekcs(self):
+    self.config['bands']["bands"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    self.config['bands']["bands"]["prefix"] = self.job_id
+    self.config['bands']["bands"]["filband"]  = f'./Projects/{self.project_id}/{self.job_id}/bands.dat'
 
+def dos_chekcs(self):
+    self.config['dos']["dos"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    self.config['dos']["dos"]["prefix"] = self.job_id
+    self.config['dos']["dos"]["fildos"]  = f'./Projects/{self.project_id}/{self.job_id}/dos.dat'
 
 def runner(project_name,iteration,file_names,calculation,qe_path,ncore):
     pre = f'''QE={qe_path}

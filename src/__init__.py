@@ -1,2 +1,2 @@
-from .pw import pw
+from .project import project
 from .ph import ph

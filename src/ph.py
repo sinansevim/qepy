@@ -5,7 +5,7 @@ from . import compute
 from . import kpoints
 from . import plots
 from . import structure
-from .pw import pw
+from .project import project
 
 
 class ph:

@@ -2,7 +2,10 @@ import numpy as np
 import json
 from . import utils
 
-def read_structure(format,name=False,project_id=False,job_id=False,config=False):
+def read_structure(self,format,name=False):
+    config = self.config['pw']
+    project_id = self.project_id
+    job_id = self.job_id
     if format.lower()=='poscar':
         if not name:
             name=project_id

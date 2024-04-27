@@ -66,11 +66,11 @@ def get_total_energy(self):
     # en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
     return(en)
 
-def configure(calculation,path="./config.json"):
+def configure(path="./config.json"):
     with open(path) as f:
         data = f.read()
         config = json.loads(data)
-    return config[calculation]
+    return config
 
 def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
     #1 - Give initial model
