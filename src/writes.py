@@ -53,3 +53,8 @@ def write_k_points_matdyn(file,k):
             file_object.write(" ".join(listed)+'\n')
 
 
+def write_hubbard(file,parameter):
+    with open(file, "a") as file_object:
+        file_object.write(f"HUBBARD {parameter['projection']} \n")
+        for term in parameter['terms']:
+            file_object.write(f"{term['interaction']} {term['atom']}-{term['orbital']} {term['value']}\n")

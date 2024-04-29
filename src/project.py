@@ -6,8 +6,6 @@ from . import kpoints
 from . import plots
 from . import structure
 
-
-
 class project:
     def __init__(self,project_id):
         self.project_id = project_id
@@ -46,18 +44,19 @@ class project:
         self.calculation = calculation_type
         if calculation_type in ['vc-relax','relax','scf','nscf','bands']:
             self.package='pw'
-            self.config['pw']['control']['calculation'] = calculation_type
-        if calculation_type == 'bands-pp':
+        elif calculation_type == 'bands-pp':
             self.package='bands'
-        if calculation_type == 'dos':
-            self.package='dos'
-        if calculation_type == 'ph':
-            self.package='ph'
-        if calculation_type == 'q2r':
-            self.package='q2r'
-        if calculation_type == 'matdyn':
-            self.package='matdyn'
+        elif calculation_type in ['pdos','kdos']:
+            self.package='projwfc'
+        else:
+            self.package=calculation_type
+
         self.file_path = f"./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in"
+
+    def hubbard(self,atom,orbital,value,interaction='U',projection="atomic"):
+        self.config['pw']['hubbard']['projection']=projection
+        self.config['pw']['hubbard']['terms'].append({"interaction":interaction,'atom':atom,'orbital':orbital,'value':value})
+    
 
     def set_pseudo(self,pseudo_type):
         self.config['pw']['control']['pseudo_dir']='./pseudos/'+pseudo_type.upper()+'/'
@@ -65,15 +64,15 @@ class project:
     def make_afm(self,magnetic_atom,angle1=False,angle2=False):
         afm_models = utils.afm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
         return afm_models
+    def make_fm(self,magnetic_atom,angle1=False,angle2=False):
+        fm = utils.fm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
+        return fm
+    def magnetise(self,magnetic_atom,angle1=False,angle2=False):
+        fm = utils.fm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
+        afm = utils.afm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
+        models = [fm,*afm]
+        return models
 
-    def create_input(self):
-            generate.input(self)
-    
-    def calculate(self, num_core=False):
-        if num_core==False:
-            num_core=self.num_core
-        if self.debug == False:
-            compute.run(self)
     def band_points(self,path,number):
         self.path=path
         points = self.get_points()
@@ -98,8 +97,8 @@ class project:
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
 
-    def plot_electron(self,ylim=False,show=False,save=False):
-        plots.plot_electron(self,ylim,show,save)
+    def plot(self,calculation,xlim=False,ylim=False):
+        plots.plot(self,calculation,xlim,ylim)
 
     def nbnd(self,number):
         self.config['pw']['system']['nbnd']=number
@@ -125,51 +124,39 @@ class project:
         self.points=kpoints
         return kpoints
     def get_structure(self,format,name=False,project_id=False,job_id=False,config=False):
-        if format=="poscar" and not name:
-            self.poscar=f'./Structures/{self.project_id}.poscar'
+        self.poscar=f'./Structures/{self.project_id}.poscar'
         reads.read_structure(self,format,name=name)
 
-    def vc_relax(self,num_core=False): #Crystal optimization
-        self.set_calculation(calculation_type='vc-relax') #set calculation
-        self.create_input() #create input
-        self.calculate(num_core) #run calculation
-    
-    def relax(self,num_core=False): #Atomic optimization
-        self.set_calculation(calculation_type='relax') #set calculation
-        self.create_input() #create mono-layer input
-        self.calculate(num_core) #run calculation
+    def calculate(self,calculation):
+        self.set_calculation(calculation_type=calculation) #set calculation
+        generate.input(self) #create input
+        compute.run(self) #run calculation
+        if calculation=='bands':
+            self.set_calculation('bands-pp') #set calculaion
+            generate.input(self) #create input
+            compute.run(self) #run calculation
+        elif calculation=='pdos':
+            utils.sumpdos(self)
+        elif calculation=='kdos':
+            utils.sumkdos(self)
 
-    def scf(self,num_core=False): #Scf calculation
-        self.set_calculation(calculation_type='scf') #set calculation
-        self.create_input() #create input
-        self.calculate(num_core) #run calculation
-    def nscf(self,num_core=False): #Scf calculation
-        self.set_calculation(calculation_type='nscf') #set calculation
-        self.create_input() #create input
-        self.calculate(num_core) #run calculation
-    def bands(self,path,num_points,num_core=False): #Band calculation
-        self.band_points(path,num_points) #define path
-        self.set_calculation(calculation_type='bands') #set calculation
-        self.create_input() #create input
-        self.calculate(num_core) #run calculations
-        self.set_calculation('bands-pp') #set calculaion
-        self.create_input() #create input
-        self.calculate(num_core) #run calculation
-    def dos(self,e_min=False,e_max=False,deltaE=False,num_core=False):
-        if e_min:
-            self.config['dos']['dos']['emin']=e_min
-        if e_max:
-            self.config['dos']['dos']['emax']=e_max
+    def dos(self,emin=False,emax=False,deltaE=False):
+        if emin:
+            self.config['dos']['dos']['emin']=emin
+        if emax:
+            self.config['dos']['dos']['emax']=emax
         if deltaE:
-            self.config['dos']['dos']['DeltaE']=deltaE
-        self.set_calculation(calculation_type='dos') #set calculation
-        self.create_input() #create input
-        self.calculate(num_core) #run calculation
-    
-
-    def plot_dos(self,xlim=False):
-        plots.plot_dos(self,xlim=xlim)
-
+            self.config['dos']['dos']['deltaE']=deltaE
+    def pdos(self,emin=False,emax=False,deltaE=False):
+        if emin:
+            self.config['projwfc']['projwfc']['emin']=emin
+        if emax:
+            self.config['projwfc']['projwfc']['emax']=emax
+        if deltaE:
+            self.config['projwfc']['projwfc']['deltaE']=deltaE
+    def kdos(self,deltaE=0.005,ngauss=0):
+            self.config['projwfc']['projwfc']['deltaE']=deltaE
+            self.config['projwfc']['projwfc']['ngauss']=ngauss
     def test(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False):
         result = utils.test_parameter(self=self,parameter_name=parameter_name,conv_thr=conv_thr,start=start,end=end,step=step,num_core=num_core,debug=debug,out=out)
         # if parameter=='ecutwfc':
@@ -187,6 +174,3 @@ class project:
         self.band_points(path,number)
         kpt = self.config['pw']['k_points_bands']
         self.config['pw']['k_points_bands']=kpt
-    def plot_phonon(self):
-        plots.plot_phonon(self)
-

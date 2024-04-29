@@ -14,19 +14,19 @@
     "ions": {},
     "cell": {},
     "k_points": "1 1 1 0 0 0",
-    "hubbard": [
-      { "projection": "ortho-atomic" },
-      [{ "type": "U", "atom": "Mn", "orbital": "3d", "value": "5.0" }]
-    ]
+    "hubbard": { "projection": "atomic", "terms": [] }
   },
   "dos": {
     "dos": {
-      "emin": "-10.0",
-      "emax": "15.0"
+      "emin": "-20.0",
+      "emax": "20.0"
     }
   },
   "bands": {
     "bands": {}
+  },
+  "projwfc": {
+    "projwfc": {}
   },
   "ph": {
     "inputph": {

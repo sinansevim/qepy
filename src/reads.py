@@ -23,23 +23,46 @@ def read_structure(self,format,name=False):
             return cell,atom
     config['atomic_species']=utils.default_pseudo(atom)
 
-    #Check magnetic atoms order 
-    for k,i in enumerate(config['atomic_species']):
-        for j in i['atom']:
-            try:
-                del config['system'][f'starting_magnetization({k+1})']
-            except:
-                pass
-            # print(j)
-            try:
-                int(j)
-                if int(j)==0:
-                    config['system'][f'starting_magnetization({k+1})']=-1
-                elif int(j)==1:
-                    config['system'][f'starting_magnetization({k+1})']=1
-                
-            except:
-                pass
+
+    try:
+        if self.magnetic_order=='afm':
+            #Check magnetic atoms order 
+            for k,i in enumerate(config['atomic_species']):
+                for j in i['atom']:
+                    try:
+                        del config['system'][f'starting_magnetization({k+1})']
+                    except:
+                        pass
+                    # print(j)
+                    try:
+                        int(j)
+                        if int(j)==0:
+                            config['system'][f'starting_magnetization({k+1})']=-1
+                        elif int(j)==1:
+                            config['system'][f'starting_magnetization({k+1})']=1
+
+                    except:
+                        pass
+    except:
+        pass
+    try:
+        if self.magnetic_order=='fm':
+            #Check magnetic atoms order 
+            for k,i in enumerate(config['atomic_species']):
+                for j in i['atom']:
+                    try:
+                        del config['system'][f'starting_magnetization({k+1})']
+                    except:
+                        pass
+            for j,i in enumerate(self.config['pw']['atomic_species']): #for each atom
+                if  i['atom']==self.magnetic_atom: # choose magnetic atom
+                    self.config['pw']['system'][f'starting_magnetization({j+1})']=1
+                    if (self.angle1):
+                        self.config['pw']['system'][f'angle1({j+1})']=self.angle1
+                    if (self.angle2):
+                        self.config['pw']['system'][f'angle2({j+1})']=self.angle2
+    except:
+        pass
 
 
     # print(cell,atom)

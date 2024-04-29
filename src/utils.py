@@ -9,7 +9,8 @@ import qcelemental as qcel
 import untangle
 import copy
 import math
-
+import glob
+from . import compute
 
 def make_monolayer(atoms):
     df = pd.DataFrame()
@@ -58,9 +59,15 @@ def plot_sigma_energy(path):
     plt.savefig('total_sigma.png')
 
 def get_total_energy(self):
-    path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
-    obj = untangle.parse(path)
-    en = float(obj.qes_espresso.output.total_energy.etot.cdata)*2
+    # path = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.save/data-file-schema.xml'
+    # obj = untangle.parse(path)
+    path = f'./Projects/{self.project_id}/{self.job_id}/scf.out'
+    temp_file = open(f'{path}', 'r').readlines()
+    for i in range(len(temp_file)):
+        if len(temp_file[i].split())>2:
+            if temp_file[i].split()[0]=='!':
+                en=temp_file[i].split()[4]
+    # en = float(obj.qes_espresso.output.total_energy.etot.cdata)*2
     # p = subprocess.Popen(f"grep '!' {path}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     # line = p.stdout.readlines()[0].decode()
     # en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
@@ -72,12 +79,35 @@ def configure(path="./config.json"):
         config = json.loads(data)
     return config
 
+
+def fm_maker(self,magnetic_atom,mag_start=1,angle1=False,angle2=False):
+    model = copy.deepcopy(self)
+    model.job_id = 'fm'
+    model.magnetic_atom=magnetic_atom
+    model.magnetic_order='fm'
+    for j,i in enumerate(model.config['pw']['atomic_species']): #for each atom
+        if  i['atom']==magnetic_atom: # choose magnetic atom
+            model.config['pw']['system'][f'starting_magnetization({j+1})']=mag_start
+            if (angle1):
+                model.config['pw']['system'][f'angle1({j+1})']=angle1
+                self.angle1=angle1
+            if (angle2):
+                model.config['pw']['system'][f'angle2({j+1})']=angle2
+                self.angle2=angle2
+            if angle1 or angle2:
+                model.config['pw']['system']['noncolin']='true'
+            else:
+                model.config['pw']['system']['nspin']=2
+    return model #send it back
+
+
 def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
     #1 - Give initial model
     #2 - Define magnetic atom
     #3 - Return magnetic states
     #4 - FM and AFM
-
+    model.magnetic_atom=magnetic_atom
+    model.magnetic_order='afm'
     """
     FM is easier to do. Only starting magnetization parameter should be added for the relevent atom
     Number of AFM states can be changing depending on the number of magnetic atoms. 
@@ -86,7 +116,7 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
     """
     models=[] #initialize models
     atom_index=[] #intialize atom index
-    for j,i in enumerate(model.config['atomic_positions']): #iterate over atomic positions
+    for j,i in enumerate(model.config['pw']['atomic_positions']): #iterate over atomic positions
         if i[0]==magnetic_atom: #select magnetic atoms
             atom_index.append(j) #add magnetic atoms index to the array
     number = len(atom_index) # check for magnetic atom number
@@ -97,30 +127,40 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
         one = np.ones(num_config).T.reshape(num_config,1) #keep the first atom up
         id = np.identity(num_config) #create other atom combinations
         spin_matrix = np.concatenate((one,id), axis=1) #combine them
-    for j,i in enumerate(model.config['atomic_species']): #for each atom
+    for j,i in enumerate(model.config['pw']['atomic_species']): #for each atom
         if  i['atom']==magnetic_atom: # choose magnetic atom
             i['atom']=i['atom']+str(int(1)) #change the name atom atom1
-            model.config['system'][f'starting_magnetization({j+1})']=mag_start[0]
+            model.config['pw']['system'][f'starting_magnetization({j+1})']=mag_start[0]
             if (angle1):
-                model.config['system'][f'angle1({j+1})']=angle1
+                model.config['pw']['system'][f'angle1({j+1})']=angle1
             if (angle2):
-                model.config['system'][f'angle2({j+1})']=angle2
+                model.config['pw']['system'][f'angle2({j+1})']=angle2
             if angle1 or angle2:
-                model.config['system']['noncolin']='true'
+                model.config['pw']['system']['noncolin']='true'
             else:
-                model.config['system']['nspin']=2
-            model.config['atomic_species'].append(copy.deepcopy(i)) #create the same atom
-    model.config['atomic_species'][-1]['atom']=magnetic_atom+str(int(0)) #change name to atom0
-    ntype = len(model.config['atomic_species'])
+                model.config['pw']['system']['nspin']=2            
+            model.config['pw']['atomic_species'].append(copy.deepcopy(i)) #create the same atom
+    model.config['pw']['atomic_species'][-1]['atom']=magnetic_atom+str(int(0)) #change name to atom0
+    ntype = len(model.config['pw']['atomic_species'])
+    model.config['pw']['ntype']=ntype
+    
+    for i in model.config['pw']['hubbard']['terms']:
+        if i['atom'].lower()==magnetic_atom.lower():
+            model.config['pw']['hubbard']['terms'].append(copy.deepcopy(i))
+            i['atom']=magnetic_atom+str(int(1))
+            model.config['pw']['hubbard']['terms'][-1]['atom']=magnetic_atom+str(int(0))
+        
+    
     if (angle1):
-        model.config['system'][f'angle1({ntype})']=angle1
+        model.config['pw']['system'][f'angle1({ntype})']=angle1
     if (angle2):
-        model.config['system'][f'angle2({ntype})']=angle2
-    model.config['system'][f'starting_magnetization({ntype})']=mag_start[1]
-    for spin_config in spin_matrix: #for each configuration of spin matirx
+        model.config['pw']['system'][f'angle2({ntype})']=angle2
+    model.config['pw']['system'][f'starting_magnetization({ntype})']=mag_start[1]
+    for i,spin_config in enumerate(spin_matrix): #for each configuration of spin matirx
         temp_model = copy.deepcopy(model) #create a model
+        temp_model.job_id = f'afm{i+1}'
         for j,i in enumerate(atom_index): #for each magnetic atom
-            temp_model.config['atomic_positions'][i][0]=temp_model.config['atomic_positions'][i][0]+str(int(spin_config[j])) #change name with the spin matrix
+            temp_model.config['pw']['atomic_positions'][i][0]=temp_model.config['pw']['atomic_positions'][i][0]+str(int(spin_config[j])) #change name with the spin matrix
         models.append(temp_model) #add to models array
     return models #send it back
 
@@ -189,14 +229,50 @@ def get_time(self):
     obj = untangle.parse(path)
     time = float(obj.qes_espresso.timing_info.total.wall.cdata)
     return time
-    # with open(path, 'r') as data:
-    #  data = data.read().split()
-    #  counter = 0 
-    #  for j,i in enumerate(data):
-    #     # if i == "PWSCF":
-    #     #     counter += 1 
-    #     #     if counter ==3:
-    #     #                         # print(f"CPU: {data[j+2]}, WALL: {data[j+4]}")
-    #     #                         return (data[j+4])
-    #     if i=='End':
-    #        return(data[j-2])
+def pdos_loader(fname):
+    import numpy as np
+
+    data = np.loadtxt(fname)
+    energy = data[:, 0]
+    pdos = data[:, 1]  # ldos col, total contribution for a given orbital
+
+    return energy, pdos
+
+
+def sumpdos(self):
+    files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/projwfc.dat*')
+    for i in files:
+        parts = i.split("_")
+        if len(parts)==2:
+            label='Total'
+        else:
+            atom = parts[1].split('(')[-1].split(')')[0]
+            orbital = parts[2].split('(')[-1].split(')')[0]
+            # print(atom,orbital)
+            compute.sumpdos(self,atom,orbital)
+
+
+def sumkdos(self):
+    files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/dos.k*')
+    for i in files:
+        parts = i.split("_")
+        if len(parts)==2:
+            label='Total'
+        else:
+            atom = parts[1].split('(')[-1].split(')')[0]
+            orbital = parts[2].split('(')[-1].split(')')[0]
+            compute.sumkdos(self,atom,orbital)
+
+
+def minimum_energy(models):
+    energies = []
+    labels =[]
+    index =[]
+    for i,state in enumerate(models):
+        energy = get_total_energy(state)
+        energies.append(float(energy))
+        labels.append(state.job_id.upper())
+        index.append(i)
+    min_state= np.argmin(energies)
+    print(labels[min_state])
+    return models[min_state]
