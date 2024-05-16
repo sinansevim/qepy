@@ -67,7 +67,7 @@ class project:
     def make_fm(self,magnetic_atom,angle1=False,angle2=False):
         fm = utils.fm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
         return fm
-    def magnetise(self,magnetic_atom,angle1=False,angle2=False):
+    def magnetize(self,magnetic_atom,angle1=False,angle2=False):
         fm = utils.fm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
         afm = utils.afm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
         models = [fm,*afm]
@@ -154,7 +154,8 @@ class project:
             self.config['projwfc']['projwfc']['emax']=emax
         if deltaE:
             self.config['projwfc']['projwfc']['deltaE']=deltaE
-    def kdos(self,deltaE=0.005,ngauss=0):
+    def kdos(self,deltaE=0.005,ngauss=0,degauss=0.01):
+            self.config['projwfc']['projwfc']['degauss']=degauss
             self.config['projwfc']['projwfc']['deltaE']=deltaE
             self.config['projwfc']['projwfc']['ngauss']=ngauss
     def test(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False):
