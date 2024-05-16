@@ -152,10 +152,10 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
         
     
     if (angle1):
-        model.config['pw']['system'][f'angle1({ntype})']=angle1
+        model.config['pw']['system'][f'angle1({ntyp})']=angle1
     if (angle2):
-        model.config['pw']['system'][f'angle2({ntype})']=angle2
-    model.config['pw']['system'][f'starting_magnetization({ntype})']=mag_start[1]
+        model.config['pw']['system'][f'angle2({ntyp})']=angle2
+    model.config['pw']['system'][f'starting_magnetization({ntyp})']=mag_start[1]
     for i,spin_config in enumerate(spin_matrix): #for each configuration of spin matirx
         temp_model = copy.deepcopy(model) #create a model
         temp_model.job_id = f'afm{i+1}'

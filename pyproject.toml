@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "espresso-machine"
-version = "0.0.118"
+version = "0.0.119"
 authors = [
   { name="Susy Exists", email="susy@selectron.me" },
 ]
