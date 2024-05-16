@@ -141,8 +141,8 @@ def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
                 model.config['pw']['system']['nspin']=2            
             model.config['pw']['atomic_species'].append(copy.deepcopy(i)) #create the same atom
     model.config['pw']['atomic_species'][-1]['atom']=magnetic_atom+str(int(0)) #change name to atom0
-    ntype = len(model.config['pw']['atomic_species'])
-    model.config['pw']['system']['ntype']=ntype
+    ntyp = len(model.config['pw']['atomic_species'])
+    model.config['pw']['system']['ntyp']=ntyp
     
     for i in model.config['pw']['hubbard']['terms']:
         if i['atom'].lower()==magnetic_atom.lower():
