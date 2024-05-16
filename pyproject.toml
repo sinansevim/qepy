@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "espresso-machine"
+version = "0.0.113"
+authors = [
+  { name="Susy Exists", email="susy@selectron.me" },
+]
+description = "Quantum Espresso automation tool"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "numpy","matplotlib","pandas","qcelemental","ase","Flask","qe-tools","scipy","seekpath","untangle","tools_barebone"
+]
+
+[project.urls]
+Homepage = "https://github.com/susyexstsi/espresso-machine"
+
