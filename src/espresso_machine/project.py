@@ -7,9 +7,9 @@ from . import plots
 from . import structure
 
 class project:
-    def __init__(self,project_id):
+    def __init__(self,project_id,config=False):
         self.project_id = project_id
-        self.config = utils.configure()
+        self.config = utils.configure(config)
         self.atom = False
         self.lattice = False
         self.calculation=False
@@ -97,8 +97,8 @@ class project:
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
 
-    def plot(self,calculation,xlim=False,ylim=False):
-        plots.plot(self,calculation,xlim,ylim)
+    def plot(self,calculation,save=False,xlim=False,ylim=False):
+        plots.plot(self,calculation,save,xlim,ylim)
 
     def nbnd(self,number):
         self.config['pw']['system']['nbnd']=number
@@ -123,9 +123,9 @@ class project:
         lattice,atoms,kpoints = structure.primitive(self.poscar,file)
         self.points=kpoints
         return kpoints
-    def get_structure(self,format,name=False,project_id=False,job_id=False,config=False):
-        self.poscar=f'./Structures/{self.project_id}.poscar'
-        reads.read_structure(self,format,name=name)
+    def get_structure(self,format,name=False,path=False,project_id=False,job_id=False,config=False):
+        # self.poscar=f'./Structures/{self.project_id}.poscar'
+        reads.read_structure(self,format,name=name,path=path)
 
     def calculate(self,calculation):
         self.set_calculation(calculation_type=calculation) #set calculation

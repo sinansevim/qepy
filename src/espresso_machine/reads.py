@@ -2,14 +2,16 @@ import numpy as np
 import json
 from . import utils
 
-def read_structure(self,format,name=False):
+def read_structure(self,format,path=False,name=False):
     config = self.config['pw']
     project_id = self.project_id
     job_id = self.job_id
     if format.lower()=='poscar':
         if not name:
             name=project_id
-        cell,atom = read_poscar(f"./Structures/{name}.poscar")  
+        if not path:
+            path='./'
+        cell,atom = read_poscar(f"{path}/{name}")  
     if format.lower()=='vc-relax':
         cell, atom = read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
     if format.lower()=='relax':

@@ -11,6 +11,7 @@ import copy
 import math
 import glob
 from . import compute
+from .config import default_config
 
 def make_monolayer(atoms):
     df = pd.DataFrame()
@@ -73,10 +74,13 @@ def get_total_energy(self):
     # en = float(re.findall(r"[-+]?(?:\d*\.*\d+)", line)[0])
     return(en)
 
-def configure(path="./config.json"):
-    with open(path) as f:
-        data = f.read()
-        config = json.loads(data)
+def configure(path):
+    if not path:
+        config = default_config
+    else:
+        with open(path) as f:
+            data = f.read()
+            config = json.loads(data)
     return config
 
 

@@ -5,17 +5,17 @@ from . import reads
 from . import utils
 
 
-def plot(self,calculation,xlim=False,ylim=False):
+def plot(self,calculation,save,xlim=False,ylim=False):
     if calculation=='electron':
-        plot_electron(self,ylim=ylim)
+        plot_electron(self,ylim=ylim,save=save)
     if calculation=='phonon':
-        plot_phonon(self)
+        plot_phonon(self,save=save)
     if calculation=='dos':
-        plot_dos(self,xlim=xlim)
+        plot_dos(self,xlim=xlim,save=save)
     if calculation=='pdos':
-        plot_pdos(self,xlim=xlim)
+        plot_pdos(self,xlim=xlim,save=save)
     if calculation=='kdos':
-        plot_kdos(self,ylim=ylim)
+        plot_kdos(self,ylim=ylim,save=save)
 
 def plot_electron(self,ylim=False,show=False,save=True):
     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
@@ -108,7 +108,7 @@ def plot_dos(self,save=True,xlim=False):
         if save==True:
             plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/dos.png')
     
-def plot_pdos(self,xlim=False):
+def plot_pdos(self,xlim=False,save=False):
     files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/sumpdos*')
     files.append(f'./Projects/{self.project_id}/{self.job_id}/projwfc.dat.pdos_tot')
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/nscf.out')
@@ -138,7 +138,7 @@ def plot_pdos(self,xlim=False):
     plt.legend(frameon=False)
     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/pdos.png')
 
-def plot_kdos(self,ylim=False):
+def plot_kdos(self,ylim=False,save=False):
     files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/sumkdos*')
     files.append(f'./Projects/{self.project_id}/{self.job_id}/dos.k.pdos_tot')
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
