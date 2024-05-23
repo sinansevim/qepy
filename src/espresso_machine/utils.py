@@ -13,19 +13,27 @@ import glob
 from . import compute
 from .config import default_config
 
-def make_monolayer(atoms):
+def shift_frac(atoms,vector):
+    return np.mod(atoms+vector,1)
+
+def make_monolayer(atoms,direction='z'):
+    direction = direction.lower()
+    if direction not in ['x','y','z']:
+        raise Exception("Direction should be x y or z")
     df = pd.DataFrame()
     atoms=np.array(atoms)
     df['Atoms'] = atoms.T[0]
     df['x'] = atoms.T[1].astype(float)
     df['y'] = atoms.T[2].astype(float)
     df['z'] = atoms.T[3].astype(float)
-    df = df.query('z<0.5')
+    df = df.query(f'{direction}<0.5')
     df_shifted = pd.DataFrame()
     df_shifted["Atoms"] = df['Atoms'].values
-    df_shifted["x"] = df['x'].values
-    df_shifted["y"] = df['y'].values
-    df_shifted["z"] = df['z'].values+0.25
+    for i in ['x','y','z']:
+        if direction==i:
+            df_shifted[i] = df[i].values+0.25
+        else:
+            df_shifted[i] = df[i].values
     return df_shifted.values
 
 
@@ -102,14 +110,17 @@ def fm_maker(self,magnetic_atom,mag_start=1,angle1=False,angle2=False):
                 model.config['pw']['system']['noncolin']='true'
             else:
                 model.config['pw']['system']['nspin']=2
+    ntyp = len(model.config['pw']['atomic_species'])
+    model.config['pw']['system']['ntyp']=ntyp
     return model #send it back
 
 
-def afm_maker(model,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
+def afm_maker(self,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
     #1 - Give initial model
     #2 - Define magnetic atom
     #3 - Return magnetic states
     #4 - FM and AFM
+    model = copy.deepcopy(self)
     model.magnetic_atom=magnetic_atom
     model.magnetic_order='afm'
     """
