@@ -5,6 +5,7 @@ from . import compute
 from . import kpoints
 from . import plots
 from . import structure
+import numpy as np 
 
 class project:
     def __init__(self,project_id,config=False):
@@ -58,8 +59,11 @@ class project:
         self.config['pw']['hubbard']['terms'].append({"interaction":interaction,'atom':atom,'orbital':orbital,'value':value})
     
 
-    def set_pseudo(self,pseudo_type):
-        self.config['pw']['control']['pseudo_dir']='./pseudos/'+pseudo_type.upper()+'/'
+    def set_pseudo(self,pseudo_type=False,path=False):
+        if path is not False:
+            self.config['pw']['control']['pseudo_dir']=f'{path}'
+        elif pseudo_type is not False:
+            self.config['pw']['control']['pseudo_dir']='./pseudos/'+pseudo_type.upper()+'/'
     
     def make_afm(self,magnetic_atom,angle1=False,angle2=False):
         afm_models = utils.afm_maker(self,magnetic_atom,angle1=angle1,angle2=angle2)
@@ -86,9 +90,9 @@ class project:
         self.config['pw']['system']['ecutrho'] = number
     def conv_thr(self,number):
         self.config['pw']['electrons']['conv_thr']=number
-    def make_layer(self,layer_type):
+    def make_layer(self,layer_type='mono',direction='z'):
         if layer_type=='mono':
-            self.config['pw']['atomic_positions'] = utils.make_monolayer(self.config['pw']['atomic_positions'])
+            self.config['pw']['atomic_positions'] = utils.make_monolayer(self.config['pw']['atomic_positions'],direction)
     def k_points(self,number):
         if type(number) == int :
             self.config['pw']['k_points']=f'{number} {number} {number} 0 0 0'
@@ -96,6 +100,19 @@ class project:
             self.config['pw']['k_points']=f'{number[0]} {number[1]} {number[2]} 0 0 0'
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
+
+
+    def shift_atoms(self,vector):
+        atoms = np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
+        shifted = utils.shift_frac(atoms=atoms,vector=vector)
+        for i,atom in enumerate(shifted):
+            for j in range(3):
+                self.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
+
+
+
+        self.config['pw']['atomic_positions']
+
 
     def plot(self,calculation,save=False,xlim=False,ylim=False):
         plots.plot(self,calculation,save,xlim,ylim)
@@ -115,14 +132,18 @@ class project:
     def nosym(self,value):
         self.config['pw']['system']['nosym'] = value
     def get_primitive(self,file='vasp-ase'):
-        lattice,atoms,kpoints = structure.primitive(self.poscar,file)
+        lattice,atoms,k_points = structure.primitive(self.poscar,file)
         self.config['pw']['atomic_positions'] = atoms
         self.config['pw']['cell_parameters']=lattice
         
-    def get_points(self,file='vasp-ase'):
-        lattice,atoms,kpoints = structure.primitive(self.poscar,file)
-        self.points=kpoints
-        return kpoints
+    def get_points(self,file_path=False,file_format=False):
+        if file_format==False:
+            file_format='qeinp-qetools'
+        if file_path==False:
+            file_path=f'./Projects/{self.project_id}/{self.job_id}/scf.in'
+        k_points = structure.get_k(file_path,file_format)
+        self.points=k_points
+        return k_points
     def get_structure(self,format,name=False,path=False,project_id=False,job_id=False,config=False):
         # self.poscar=f'./Structures/{self.project_id}.poscar'
         reads.read_structure(self,format,name=name,path=path)

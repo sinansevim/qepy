@@ -24,6 +24,8 @@ def read_structure(self,format,path=False,name=False):
         except:
             return cell,atom
     config['atomic_species']=utils.default_pseudo(atom)
+    ntyp = len(config['atomic_species'])
+    config['system']['ntyp']=ntyp
 
 
     try:
