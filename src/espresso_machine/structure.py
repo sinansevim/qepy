@@ -298,7 +298,8 @@ def process_structure_core(  # pylint: disable=too-many-locals,too-many-statemen
             extra={"traceback": traceback.extract_stack(), "form_data": form_data,},
         )
         raise
-
+    # print(raw_code_dict)
+    # print(direct_vectors)
     return dict(
         jsondata=json.dumps(out_json_data),
         volume_ratio_prim=int(round(path_results["volume_original_wrt_prim"])),
@@ -335,4 +336,10 @@ def primitive(fileContent,fileformat):
     return (lattice,atoms,kpoints)
 
 
-
+def get_k(fileContent,fileformat):
+    with open(fileContent) as file:
+        fileContent = file.read()
+    process_structure_core(filecontent=fileContent,fileformat=fileformat)
+    structure = process_structure_core(filecontent=fileContent,fileformat=fileformat)
+    kpoints = structure['kpoints_rel']
+    return (kpoints)
