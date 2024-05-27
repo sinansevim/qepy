@@ -1,3 +1,4 @@
+import numpy as np
 def write_atom_species(file,atomic_species):
     with open(file, "a") as file_object:
         file_object.write("ATOMIC_SPECIES \n")
@@ -19,17 +20,16 @@ def write_atom_positions(file, positions):
                     file_object.write(" ".join(str(i))+'\n')
 
 def write_cell_parameters(file, cell):
+    try:
+        cell = np.array(cell,float)
+    except:
+        print('Something is wrong with the cell parameters. The error got caught on input file writing step.')
     with open(file, "a") as file_object:
         file_object.write("CELL_PARAMETERS (angstrom) \n")
         for i in cell:
-            try:
-                file_object.write(" ".join(i)+'\n')
-            except:
-                try:
-                    file_object.write(" ".join(i.astype(str))+'\n')
-                except:
-                    file_object.write(" ".join(str(i))+'\n')
-            # print(i.astype(str))
+            for k,j in enumerate(i):
+                file_object.write(f"{np.around(j,8):<.10f}  ")
+            file_object.write("\n")
 
 
 def write_k_points(file, k):
