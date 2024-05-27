@@ -339,7 +339,6 @@ def primitive(fileContent,fileformat):
 def get_k(fileContent,fileformat):
     with open(fileContent) as file:
         fileContent = file.read()
-    process_structure_core(filecontent=fileContent,fileformat=fileformat)
     structure = process_structure_core(filecontent=fileContent,fileformat=fileformat)
     kpoints = structure['kpoints_rel']
     return (kpoints)
