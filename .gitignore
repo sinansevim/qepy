@@ -1,7 +1,9 @@
 results/
+Research/
+Projects/
 # pseudos/
 .DS_Store
-Dev.ipynb
+Dev.*
 TODO/
 # Byte-compiled / optimized / DLL files
 __pycache__/
