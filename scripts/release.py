@@ -43,6 +43,5 @@ def create_new_patch_release():
         check=True,
     )
 
-
 if __name__ == "__main__":
     create_new_patch_release()
