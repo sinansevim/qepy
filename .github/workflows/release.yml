@@ -1,6 +1,5 @@
 name: Create a new patch release
-on:
-  push
+on:workflow_dispatch
 jobs:
   github:
     runs-on: ubuntu-22.04
