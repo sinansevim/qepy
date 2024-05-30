@@ -13,6 +13,20 @@ import glob
 from . import compute
 from .config import default_config
 
+def shift_cell(atom,cell,direction,vector):
+    vacuum_atom = np.dot(atom,cell)+vector
+    directions = ['x','y','z']
+    shift_matrix = np.zeros(shape=(3,3))
+    for i,j in enumerate(directions):
+        if direction==j:
+            shift_matrix[i]=np.array(vector)*2
+    cell_vacuum = cell+shift_matrix
+    frac_vacuum = np.dot(vacuum_atom,np.linalg.inv(cell_vacuum))
+
+    return frac_vacuum,cell_vacuum
+
+
+
 def shift_frac(atoms,vector):
     return np.mod(atoms+vector,1)
 

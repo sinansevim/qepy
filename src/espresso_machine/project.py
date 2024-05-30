@@ -101,6 +101,15 @@ class project:
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
 
+    def add_vacuum(self,direction,vector):
+            cell = np.array(self.config['pw']["cell_parameters"],dtype=float)
+            atom =  np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
+            vacuum_atom, vacuum_cell =  utils.shift_cell(atom,cell,direction,vector)
+            for i,atom in enumerate(vacuum_atom):
+                for j in range(3):
+                    self.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
+            self.config['pw']["cell_parameters"] = vacuum_cell
+
 
     def shift_atoms(self,vector):
         atoms = np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
