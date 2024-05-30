@@ -1,9 +1,7 @@
 results/
-Research/
 Projects/
 # pseudos/
 .DS_Store
-Dev.*
 TODO/
 # Byte-compiled / optimized / DLL files
 __pycache__/
