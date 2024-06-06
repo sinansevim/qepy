@@ -100,10 +100,17 @@ class project:
             self.config['pw']['k_points']=f'{number[0]} {number[1]} {number[2]} 0 0 0'
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
+        
+    def atoms(self):
+        return self.config['pw']['atomic_positions']
+    
+    def positions(self):
+        atom =  np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
+        return atom
 
     def add_vacuum(self,direction,vector):
             cell = np.array(self.config['pw']["cell_parameters"],dtype=float)
-            atom =  np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
+            atom =  self.positions()
             vacuum_atom, vacuum_cell =  utils.shift_cell(atom,cell,direction,vector)
             for i,atom in enumerate(vacuum_atom):
                 for j in range(3):
