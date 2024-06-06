@@ -1,7 +1,8 @@
 results/
+Projects/
 # pseudos/
 .DS_Store
-
+TODO/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
