@@ -2,8 +2,12 @@ import subprocess
 
 def run(self):
     if self.debug == False:
-        p = subprocess.Popen(f"mpirun -np {self.num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
+        if self.gpu==True:
+                p = subprocess.Popen(f"srun --mpi=pmi2 singularity run --nv  /work/bansil/s.sevim/software/qe-gpu/qe-7.1-gpu.sif {self.package}.x -npool 4 -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                p.wait()
+        else:
+                p = subprocess.Popen(f"mpirun -np {self.num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                p.wait()
         print(f'{self.calculation} is finished')
 
 def sumpdos(self,atom,orbital):

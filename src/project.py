@@ -17,6 +17,7 @@ class project:
         self.path = False
         self.poscar= False
         self.debug = False
+        self.gpu = False
         self.num_core=1
 
     def set_cores(self,value):
