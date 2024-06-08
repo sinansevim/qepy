@@ -58,3 +58,33 @@ def write_hubbard(file,parameter):
         file_object.write(f"HUBBARD {parameter['projection']} \n")
         for term in parameter['terms']:
             file_object.write(f"{term['interaction']} {term['atom']}-{term['orbital']} {term['value']}\n")
+
+
+def write_poscar(structure_name,atom,cell,file_name='POSCAR',file_path='./'):
+    full_path = file_path+file_name+".poscar"
+    atom_name = np.array(atom).T[0].tolist()
+    atom_type=set(atom_name)
+    atom_number = []
+    for i in atom_type:
+        atom_number.append(atom_name.count(i))
+
+    with open(full_path, "w") as file_object:
+        file_object.write(f"{structure_name} \n")
+        file_object.write("1.0 \n")
+        for i in cell:
+            for k,j in enumerate(i):
+                file_object.write(f"{np.around(float(j),8):<.10f}  ")
+            file_object.write("\n")
+        for i in atom_type:
+            file_object.write(f"{i}  ")
+            file_object.write("\n")
+        for i in atom_number:
+            file_object.write(f"{i}  ")
+            file_object.write("\n")
+        file_object.write("direct")
+        file_object.write("\n")
+        for i in atom:
+            for k,j in enumerate(i[1:]):
+                file_object.write(f"{np.around(float(j),8):<.10f}  ")
+            file_object.write(f"{i[0]}  ")
+            file_object.write("\n")
