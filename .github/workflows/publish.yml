@@ -22,13 +22,19 @@ jobs:
     - name: Extract tag name
       id: tag
       run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3)
+    - name: Copy setup.py to main directory
+      run: >-
+        cp .github/workflows/setup.py ./
     - name: Update version in setup.py
       run: >-
         sed -i "s/{{VERSION_PLACEHOLDER}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
     - name: Build a binary wheel
       run: >-
         python setup.py sdist bdist_wheel
+    - name: Remove setup.py from the main directory
+      run: >-
+        rm setup.py
     - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}

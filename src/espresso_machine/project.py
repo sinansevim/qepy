@@ -5,6 +5,7 @@ from . import compute
 from . import kpoints
 from . import plots
 from . import structure
+from . import writes
 import numpy as np 
 
 class project:
@@ -18,6 +19,8 @@ class project:
         self.path = False
         self.poscar= False
         self.debug = False
+        self.magnetism=False
+        self.gpu = False
         self.num_core=1
 
     def set_cores(self,value):
@@ -90,6 +93,16 @@ class project:
         self.config['pw']['system']['ecutrho'] = number
     def conv_thr(self,number):
         self.config['pw']['electrons']['conv_thr']=number
+    def ph_thr(self,number):
+        self.config['ph']['inputph']['tr2_ph']=number
+    def force(self,value=True):
+        self.config['pw']['control']['tprnfor'] = value
+    def stress(self,value=True):
+        self.config['pw']['control']['tstress'] = value
+    def etot_conv_thr(self,value):
+        self.config['pw']['control']['etot_conv_thr'] = value
+    def forc_conv_thr(self,value):
+        self.config['pw']['control']['forc_conv_thr'] = value
     def make_layer(self,layer_type='mono',direction='z'):
         if layer_type=='mono':
             self.config['pw']['atomic_positions'] = utils.make_monolayer(self.config['pw']['atomic_positions'],direction)
@@ -100,10 +113,17 @@ class project:
             self.config['pw']['k_points']=f'{number[0]} {number[1]} {number[2]} 0 0 0'
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
+        
+    def atoms(self):
+        return self.config['pw']['atomic_positions']
+    
+    def positions(self):
+        atom =  np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
+        return atom
 
     def add_vacuum(self,direction,vector):
             cell = np.array(self.config['pw']["cell_parameters"],dtype=float)
-            atom =  np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
+            atom =  self.positions()
             vacuum_atom, vacuum_cell =  utils.shift_cell(atom,cell,direction,vector)
             for i,atom in enumerate(vacuum_atom):
                 for j in range(3):
@@ -144,13 +164,43 @@ class project:
         lattice,atoms,k_points = structure.primitive(self.poscar,file)
         self.config['pw']['atomic_positions'] = atoms
         self.config['pw']['cell_parameters']=lattice
+    def soc(self,pseudo_path=False):
+        if pseudo_path==False:
+            pseudo_path = f"Research/{self.project_id}/REL"
+        try:
+            del self.config['pw']['system']['nspin']
+        except:
+            pass
+        self.config['pw']['system']['noncolin']= True
+        self.config['pw']['system']['lspinorb']= True
+    def starting_potential(self,potential='file'):
+        self.config['pw']['electrons']['startingpot']= potential
+        if self.magnetism==True:
+            self.config['pw']['system']['lforcet'] = True
+    def magnetic_angle(self,angle1=[0,0],angle2=[0,0]):
+        ntype = len(self.config['pw']['atomic_species']) #check number of atom types
+        magnetic_atoms = [] #create magnetic atom index array
+        for j,i in enumerate(self.config['pw']['atomic_species']): #for each atom
+            if  i['atom']==self.magnetic_atom: # choose magnetic atom
+                magnetic_atoms.append(j) #add atom magnetic atom list
+            for k in range(ntype): #this for is necessary for AFM due to naming convention
+                if  i['atom']==self.magnetic_atom+str(k): # choose magnetic atom
+                    magnetic_atoms.append(j) #add atom magnetic atom list
+        for j,i in enumerate(magnetic_atoms): #for all magnetic atoms
+            self.config['pw']['system'][f'angle1({i+1})']=angle1[j] #define angle1 for atoms
+            self.config['pw']['system'][f'angle2({j+1})']=angle2[j]#define angle2 for atoms
         
     def get_points(self,file_path=False,file_format=False):
         if file_format==False:
             file_format='qeinp-qetools'
         if file_path==False:
             file_path=f'./Projects/{self.project_id}/{self.job_id}/scf.in'
-        k_points = structure.get_k(file_path,file_format)
+        try:
+            k_points = structure.get_k(file_path,file_format)
+        except:
+            file_path=f'./Projects/{self.project_id}/{self.job_id}/vc-relax.in'
+            k_points = structure.get_k(file_path,file_format)
+
         self.points=k_points
         return k_points
     def get_structure(self,format,name=False,path=False,project_id=False,job_id=False,config=False):
@@ -188,8 +238,8 @@ class project:
             self.config['projwfc']['projwfc']['degauss']=degauss
             self.config['projwfc']['projwfc']['deltaE']=deltaE
             self.config['projwfc']['projwfc']['ngauss']=ngauss
-    def test(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False):
-        result = utils.test_parameter(self=self,parameter_name=parameter_name,conv_thr=conv_thr,start=start,end=end,step=step,num_core=num_core,debug=debug,out=out)
+    def test(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False,dual=4):
+        result = utils.test_parameter(self=self,parameter_name=parameter_name,conv_thr=conv_thr,start=start,end=end,step=step,num_core=num_core,debug=debug,out=out,dual=dual)
         # if parameter=='ecutwfc':
         #     result = utils.test_ecutwfc(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
         # elif parameter=='kpoints':
@@ -205,3 +255,17 @@ class project:
         self.band_points(path,number)
         kpt = self.config['pw']['k_points_bands']
         self.config['pw']['k_points_bands']=kpt
+
+    def export_structure(self,format='poscar',file_path="./",file_name=False,structure_name=False):
+        atom = self.config['pw']['atomic_positions']
+        cell = self.config['pw']['cell_parameters']
+        if structure_name==False:
+            if self.job_id=='results':
+                structure_name = self.project_id
+            else:
+                structure_name = self.project_id+self.job_id
+        if file_name==False:
+            file_name=structure_name
+
+        if format.lower()=='poscar':
+            writes.write_poscar(structure_name=structure_name,atom=atom,cell=cell,file_name=file_name,file_path=file_path)

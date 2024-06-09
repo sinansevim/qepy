@@ -8,13 +8,31 @@ model.set_pseudo(path='./Research/TiSe2')
 model.ecutwfc(100) #Set wavefunction cutoff
 model.ecutrho(700) #Set wavefunction cutoff
 model.k_points(16) #Set number of k points
+<<<<<<< HEAD
+=======
+model.degauss(0.02) #Set degauss value
+>>>>>>> 98864ad75751acea34123e9f208162b39be9cc6c
 model.conv_thr(1e-8) #Set convergence threshold
 model.smearing('fd')
 model.shift_atoms([0,0,0.5]) #Shift Te atom to the middle
 model.config['pw']['control']['etot_conv_thr'] = 10**-5
 model.config['pw']['control']['forc_conv_thr'] = 10**-4
+<<<<<<< HEAD
 model.nbnd(40)
 
+=======
+
+
+sigmas = [0.1,0.05,0.04,0.03,0.02,0.01]
+
+import copy 
+models = [copy.deepcopy(model).degauss(sigma) for sigma in sigmas]
+
+
+
+
+ 
+>>>>>>> 98864ad75751acea34123e9f208162b39be9cc6c
 def pipeline(model):
      #Step 1 - Crystal optimization
     model.calculate('vc-relax')
@@ -51,6 +69,7 @@ def pipeline(model):
      #Step 9 - Phonon Plotting
     model.plot('phonon',save=True) # Plot phonon band
 
+<<<<<<< HEAD
 sigmas = [0.05,0.04,0.03,0.02,0.01]
 
 import copy 
@@ -63,3 +82,5 @@ for i,sigma in enumerate(sigmas):
     pipeline(models[i])
 
     
+=======
+>>>>>>> 98864ad75751acea34123e9f208162b39be9cc6c

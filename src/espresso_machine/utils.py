@@ -109,6 +109,7 @@ def configure(path):
 def fm_maker(self,magnetic_atom,mag_start=1,angle1=False,angle2=False):
     model = copy.deepcopy(self)
     model.job_id = 'fm'
+    model.magnetism=True
     model.magnetic_atom=magnetic_atom
     model.magnetic_order='fm'
     for j,i in enumerate(model.config['pw']['atomic_species']): #for each atom
@@ -137,14 +138,15 @@ def afm_maker(self,magnetic_atom,mag_start=[1,-1],angle1=False,angle2=False):
     model = copy.deepcopy(self)
     model.magnetic_atom=magnetic_atom
     model.magnetic_order='afm'
+    model.magnetism=True
     """
-    FM is easier to do. Only starting magnetization parameter should be added for the relevent atom
+    FM is easier to do. Only starting magnetization parameter should be added for the relevant atom
     Number of AFM states can be changing depending on the number of magnetic atoms. 
     The number of magnetic atoms should be divided into two for spin up and down. 
     Total magnetism is going to be zero but the order of spins are going to be change.
     """
     models=[] #initialize models
-    atom_index=[] #intialize atom index
+    atom_index=[] #initialize atom index
     for j,i in enumerate(model.config['pw']['atomic_positions']): #iterate over atomic positions
         if i[0]==magnetic_atom: #select magnetic atoms
             atom_index.append(j) #add magnetic atoms index to the array
@@ -214,22 +216,23 @@ def atom_type(atom):
     return num_type
 
 
-def test_parameter(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False):
+def test_parameter(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False,dual=4):
     parameter = np.arange(start,end,step)
     result = np.zeros(shape=(3,len(parameter)))
     end=0
     for j,i in enumerate(parameter):
         if parameter_name=="ecutwfc":
             self.ecutwfc(i)
+            self.ecutrho(dual*i)
             self.job_id=f"ecutwfc_{i}"
         if parameter_name=="kpoints":
             self.k_points(int(i))
             self.job_id=f"kpoints_{i}"
         if parameter_name=="num_core":
             self.job_id=f"num_core_{i}"
-            num_core = i
+            self.num_core
         if debug==False:
-            self.scf(num_core)
+            self.calculate('scf')
         temp_en = get_total_energy(self)
         temp_time = get_time(self)
         result[0][j]=i #parameters
