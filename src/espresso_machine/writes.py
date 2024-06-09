@@ -73,7 +73,7 @@ def write_poscar(structure_name,atom,cell,file_name='POSCAR',file_path='./'):
         file_object.write("1.0 \n")
         for i in cell:
             for k,j in enumerate(i):
-                file_object.write(f"{np.around(float(j),8):<.10f}  ")
+                file_object.write(f"{np.around(float(j),10):<.12f}  ")
             file_object.write("\n")
         for i in atom_type:
             file_object.write(f"{i}  ")

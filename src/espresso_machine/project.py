@@ -6,6 +6,7 @@ from . import kpoints
 from . import plots
 from . import structure
 from . import writes
+from . import checks
 import numpy as np 
 
 class project:
@@ -212,7 +213,7 @@ class project:
         generate.input(self) #create input
         compute.run(self) #run calculation
         if calculation=='bands':
-            self.set_calculation('bands-pp') #set calculaion
+            self.set_calculation('bands-pp') #set calculation
             generate.input(self) #create input
             compute.run(self) #run calculation
         elif calculation=='pdos':
@@ -220,6 +221,34 @@ class project:
         elif calculation=='kdos':
             utils.sumkdos(self)
 
+
+
+    def check_convergence(self,calculation=False,job_id=False):
+        if calculation==False:
+            calculation=self.calculation
+        if job_id == False:
+            job_id = self.job_id
+        path = f'./Projects/{self.project_id}/{job_id}/{calculation}.out'
+        if calculation in ['relax','vc-relax']:
+            isConverged = checks.check_relax(path=path)
+        return isConverged
+
+
+
+    def relax_iteration(self,max_iter = 10,calculation=False):
+        if calculation==False:
+            calculation=self.calculation
+        for i in range(max_iter):
+            print(f'Starting {calculation} iteration {i+1} ')
+            self.calculate(calculation)
+            self.get_structure(calculation)
+            isConverged = self.check_convergence(calculation)
+            if isConverged:
+                print(f'{calculation} is converged after {i+1} steps')
+                break
+        if i==max_iter-1 and not isConverged:
+            print(f'{calculation} did not converged please increace number of steps steps')
+                
     def dos(self,emin=False,emax=False,deltaE=False):
         if emin:
             self.config['dos']['dos']['emin']=emin
