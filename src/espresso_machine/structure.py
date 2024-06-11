@@ -84,37 +84,10 @@ def process_structure_core(  # pylint: disable=too-many-locals,too-many-statemen
     fileobject = io.StringIO(str(filecontent))
     # form_data = dict(flask_request.form)
     form_data = None
-    try:
-        structure_tuple = get_structure_tuple(
+
+    structure_tuple = get_structure_tuple(
             fileobject, fileformat, extra_data=None
         )
-    except UnknownFormatError:
-        logme(
-            logger,
-            filecontent,
-            fileformat,
-            flask_request,
-            call_source,
-            reason="unknownformat",
-            extra={"form_data": form_data,},
-        )
-        raise FlaskRedirectException("Unknown format '{}'".format(fileformat))
-    except Exception:
-        # There was an exception...
-        logme(
-            logger,
-            filecontent,
-            fileformat,
-            flask_request,
-            call_source,
-            reason="exception",
-            extra={"traceback": traceback.format_exc(), "form_data": form_data,},
-        )
-        raise FlaskRedirectException(
-            "I tried my best, but I wasn't able to load your "
-            "file in format '{}'...".format(fileformat)
-        )
-
     if len(structure_tuple[1]) > MAX_NUMBER_OF_ATOMS:
         ## Structure too big
         logme(

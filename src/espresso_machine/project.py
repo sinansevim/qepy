@@ -81,11 +81,17 @@ class project:
         models = [fm,*afm]
         return models
 
-    def band_points(self,path,number):
+    def band_points(self,path,number,file_path=False,file_name=False,file_format=False):
         self.path=path
-        points = self.get_points()
+        file_path = f'./Projects/{self.project_id}/{self.job_id}'
+        file_name = f"{self.project_id}_{self.job_id}"
+        self.export_structure(file_path=file_path,file_name=file_name)
+        points = self.get_points(file_path=f'{file_path}/{file_name}.poscar',file_format="vasp-ase")
         k_path = kpoints.band_input(path,points,number)
         self.config['pw']['k_points_bands'] = k_path
+
+
+
     def occupations(self,occupation):
         self.config['pw']['system']['occupations'] = occupation
     def ecutwfc(self,number):
@@ -121,7 +127,9 @@ class project:
     def positions(self):
         atom =  np.array(self.config['pw']['atomic_positions']).T[1:].T.astype(float)
         return atom
-
+    def cell(self):
+        return self.config['pw']['cell_parameters']
+    
     def add_vacuum(self,direction,vector):
             cell = np.array(self.config['pw']["cell_parameters"],dtype=float)
             atom =  self.positions()
@@ -201,11 +209,22 @@ class project:
         except:
             file_path=f'./Projects/{self.project_id}/{self.job_id}/vc-relax.in'
             k_points = structure.get_k(file_path,file_format)
-
         self.points=k_points
         return k_points
+    
+    def electron_maxstep(self,value):
+        self.config['pw']['electrons']['electron_maxstep'] = value
+
+    def exchange_maxstep(self,value):
+        self.config['pw']['electrons']['exx_maxstep'] = value
+
+    def mixing_beta(self,value):
+        self.config['pw']['electrons']['mixing_beta'] = value
+
+    def cell_dof(self,value):
+        self.config['pw']['cell']['cell_dofree'] = value
+        
     def get_structure(self,format,name=False,path=False,project_id=False,job_id=False,config=False):
-        # self.poscar=f'./Structures/{self.project_id}.poscar'
         reads.read_structure(self,format,name=name,path=path)
 
     def calculate(self,calculation):
@@ -285,9 +304,11 @@ class project:
         kpt = self.config['pw']['k_points_bands']
         self.config['pw']['k_points_bands']=kpt
 
-    def export_structure(self,format='poscar',file_path="./",file_name=False,structure_name=False):
-        atom = self.config['pw']['atomic_positions']
-        cell = self.config['pw']['cell_parameters']
+    def export_structure(self,format='poscar',file_path=False,file_name=False,structure_name=False):
+        atom = self.atoms() #Get atomic positions
+        cell = self.cell()
+        if  file_path == False:
+            file_path = f'./Projects/{self.project_id}/{self.job_id}'
         if structure_name==False:
             if self.job_id=='results':
                 structure_name = self.project_id
@@ -295,6 +316,5 @@ class project:
                 structure_name = self.project_id+self.job_id
         if file_name==False:
             file_name=structure_name
-
         if format.lower()=='poscar':
             writes.write_poscar(structure_name=structure_name,atom=atom,cell=cell,file_name=file_name,file_path=file_path)
