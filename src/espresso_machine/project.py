@@ -249,12 +249,15 @@ class project:
             job_id = self.job_id
         path = f'./Projects/{self.project_id}/{job_id}/{calculation}.out'
         if calculation in ['relax','vc-relax']:
-            isConverged = checks.check_relax(path=path)
+            try:
+                isConverged = checks.check_relax(path=path)
+            except:
+                isConverged=False
         return isConverged
 
 
 
-    def relax_iteration(self,max_iter = 10,calculation=False):
+    def optimize(self,max_iter = 10,calculation=False):
         if calculation==False:
             calculation=self.calculation
         for i in range(max_iter):
