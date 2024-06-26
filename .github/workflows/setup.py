@@ -16,7 +16,7 @@ setup(
     author="Susy Exists",
     author_email="susy@selectron.me",
     description = "Quantum Espresso automation tool",
-    url = "https://github.com/susyexstsi/espresso-machine",
+    url = "https://github.com/susyexists/espresso-machine",
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
