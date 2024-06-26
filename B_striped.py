@@ -1,6 +1,6 @@
-from src import espresso_machine as esma
+from . import src as src
 #Initialize model
-model = esma.project(project_id="B_striped") #Define project
+model = src.project(project_id="B_striped") #Define project
 model.set_cores(64) #Define number of prcessing cores
 model.get_structure(format='poscar',path='Research/2D_Materials/Structure/',name='B_striped.poscar') #Load structure
 model.set_pseudo(path='./Research/2D_Materials/PP/PBE/US')

@@ -1,7 +1,7 @@
-from src import espresso_machine as esma
+from . import src as src
 
  #Step 1 - Initialize model
-model = esma.project(project_id="TiSe2") #Define project
+model = src.project(project_id="TiSe2") #Define project
 model.set_cores(64) #Define number of prcessing cores
 model.get_structure(format='poscar',path='./Research',name='/TiSe2/TiSe2.poscar') #Load structure
 model.set_pseudo(path='./Research/TiSe2')
