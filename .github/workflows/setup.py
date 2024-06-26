@@ -11,12 +11,12 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="espresso_machine",
+    name="EspressoMachine",
     version='{{VERSION_PLACEHOLDER}}',
     author="Susy Exists",
     author_email="susy@selectron.me",
     description = "Quantum Espresso automation tool",
-    url = "https://github.com/susyexstsi/espresso-machine",
+    url = "https://github.com/susyexists/EspressoMachine",
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),

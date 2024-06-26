@@ -1,4 +1,4 @@
-from src import espresso_machine as esma
+from src import EspressoMachine as esma
 #Initialize model
 model = esma.project(project_id="B_striped") #Define project
 model.set_cores(64) #Define number of prcessing cores

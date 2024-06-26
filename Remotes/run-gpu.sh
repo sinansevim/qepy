@@ -11,7 +11,7 @@
 
 
 module load singularity
-source /work/bansil/s.sevim/remote-deploy/espresso-machine/.venv/bin/activate
+source /work/bansil/s.sevim/remote-deploy/EspressoMachine/.venv/bin/activate
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 python job_gpu.py
 

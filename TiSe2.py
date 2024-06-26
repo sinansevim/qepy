@@ -1,4 +1,4 @@
-from src import espresso_machine as esma
+from src import EspressoMachine as esma
 
  #Step 1 - Initialize model
 model = esma.project(project_id="TiSe2") #Define project
