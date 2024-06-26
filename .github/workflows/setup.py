@@ -11,7 +11,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="EspressoMachine",
+    name="esma",
     version='{{VERSION_PLACEHOLDER}}',
     author="Susy Exists",
     author_email="susy@selectron.me",
