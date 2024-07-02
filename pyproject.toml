@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name="esma"
 dynamic = ["version"]
+
 authors = [{ name="Susy Exists", email="susy@selectron.me" }]
 description = "Quantum Espresso automation tool"
 readme = "README.md"
@@ -14,8 +15,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-[project.urls]
-Homepage = "https://github.com/susyexstsi/espresso-machine"
 dependencies = [
 "annotated-types==0.6.0"
 ,"ase==3.22.1"
@@ -100,8 +99,11 @@ dependencies = [
 ,"untangle==1.2.1"
 ,"urllib3==2.2.1"
 ,"wcwidth==0.2.13"
-,"Werkzeug==3.0.1"]
+,"Werkzeug==3.0.1"
+]
 
+[project.urls]
+Homepage = "https://github.com/susyexstsi/espresso-machine"
 
 
 [tool.setuptools_scm]
