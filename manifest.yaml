@@ -1,0 +1,28 @@
+MetaData:
+  -ProjectID : Si
+  -NumberOfCores : 4
+Parameter:
+  WavefunctionCutoff : 20
+  EnergyCutoff : 80
+  ConvergenceThreshold : 1D-6
+  Occupation : Smearing
+  Smearing : Fermi-Dirac
+  KPoints: 
+    kx : 4
+    ky : 4
+    kz : 4
+Pipeline:
+  -Optimize:
+    Type : Crystal
+  -Calculate:
+    Type : SelfConsistent
+  -Calculate:
+    Type : Band
+    Path :
+      -L     : 10
+      -GAMMA : 10
+      -X     : 10
+      -K     : 10
+      -GAMMA : 1
+    
+    
