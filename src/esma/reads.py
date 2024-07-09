@@ -11,6 +11,7 @@ def read_input(self,path=False,calculation='scf'):
     config['cell_parameters'], config['atomic_positions'] = cell,atom
 
 def read_structure(self,format,path=False,name=False):
+    config = self.config['pw']
     project_id = self.project_id
     job_id = self.job_id
     if format.lower()=='poscar':
