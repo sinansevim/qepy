@@ -233,7 +233,10 @@ class project:
         self.config['pw']['cell']['cell_dofree'] = value
         
     def get_structure(self,format,name=False,path=False,project_id=False,job_id=False,config=False):
-        reads.read_structure(self,format,name=name,path=path)
+        if format == 'input':
+            reads.read_input(self,path)
+        else:
+            reads.read_structure(self,format,name=name,path=path)
 
     def calculate(self,calculation):
         self.set_calculation(calculation_type=calculation) #set calculation

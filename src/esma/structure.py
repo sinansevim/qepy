@@ -315,3 +315,11 @@ def get_k(fileContent,fileformat):
     structure = process_structure_core(filecontent=fileContent,fileformat=fileformat)
     kpoints = structure['kpoints_rel']
     return (kpoints)
+
+def input(file_path,fileformat="qeinp-qetools"):
+    with open(file_path) as file:
+        fileContent = file.read()
+    structure = process_structure_core(filecontent=fileContent,fileformat="qeinp-qetools")
+    cell = structure['inputstructure_cell_vectors']
+    atom = structure['inputstructure_atoms_scaled']
+    return(cell,atom)

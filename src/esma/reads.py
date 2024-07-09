@@ -1,9 +1,16 @@
 import numpy as np
 import json
 from . import utils
+from . import structure
+
+def read_input(self,path=False,calculation='scf'):
+    config = self.config['pw']
+    if path == False:
+        path = f"./Projects/{project_id}/{job_id}/{calculation}"
+    cell, atom = structure.input(file_path = path)
+    config['cell_parameters'], config['atomic_positions'] = cell,atom
 
 def read_structure(self,format,path=False,name=False):
-    config = self.config['pw']
     project_id = self.project_id
     job_id = self.job_id
     if format.lower()=='poscar':
