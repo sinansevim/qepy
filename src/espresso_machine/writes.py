@@ -28,7 +28,7 @@ def write_cell_parameters(file, cell):
         file_object.write("CELL_PARAMETERS (angstrom) \n")
         for i in cell:
             for k,j in enumerate(i):
-                file_object.write(f"{np.around(j,8):<.10f}  ")
+                file_object.write(f"{np.around(j,10):<.12f}  ")
             file_object.write("\n")
 
 
@@ -86,6 +86,6 @@ def write_poscar(structure_name,atom,cell,file_name='POSCAR',file_path='./'):
         file_object.write("\n")
         for i in atom:
             for k,j in enumerate(i[1:]):
-                file_object.write(f"{np.around(float(j),8):<.10f}  ")
+                file_object.write(f"{np.around(float(j),10):<.12f}  ")
             file_object.write(f"{i[0]}  ")
             file_object.write("\n")

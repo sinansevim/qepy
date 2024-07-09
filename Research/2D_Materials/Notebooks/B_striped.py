@@ -21,8 +21,6 @@ model.config['pw']['electrons']['mixing_beta'] = 0.1
 model.stress()
 model.force()
 
-model.starting_potential('file') #start from previous calculations
-
 #PW
 model.relax_iteration(calculation='relax',max_iter=20) #Relax structure iteratively
 model.calculate('scf') #scf calculation
@@ -31,6 +29,8 @@ model.calculate('scf') #scf calculation
 model.set_q(nq1=13,nq2=11,nq3=1) #Set parameters
 model.calculate('ph') #run ph calculations
 model.calculate('q2r') #run q2r
+path = ['S','X',"GAMMA","Y","S","GAMMA"] #define corners
 num_points = 200 # Number of q points
+model.band_points(path,num_points) #define path
 model.calculate("matdyn") #run matdyn
 model.plot('phonon',save=True) # Plot phonon band

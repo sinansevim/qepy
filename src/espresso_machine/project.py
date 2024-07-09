@@ -6,7 +6,7 @@ from . import kpoints
 from . import plots
 from . import structure
 from . import writes
-from . import checks
+from . import check
 import numpy as np 
 
 class project:
@@ -90,6 +90,14 @@ class project:
         k_path = kpoints.band_input(path,points,number)
         self.config['pw']['k_points_bands'] = k_path
 
+    def pw(self):
+        return self.config['pw']
+    def system(self):
+        return self.config['system']
+    def control(self):
+        return self.config['control']
+    def electrons(self):
+        return self.config['electrons']
 
 
     def occupations(self,occupation):
@@ -250,7 +258,7 @@ class project:
         path = f'./Projects/{self.project_id}/{job_id}/{calculation}.out'
         if calculation in ['relax','vc-relax']:
             try:
-                isConverged = checks.check_relax(path=path)
+                isConverged = check.check_relax(path=path)
             except:
                 isConverged=False
         return isConverged
