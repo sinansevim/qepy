@@ -42,6 +42,8 @@ def pw(self):
     #Kpoint check
     if self.config['pw']["control"]['calculation']=='bands':
         writes.write_k_points_bands(self.file_path, self.config['pw']['k_points_bands'])
+    elif type(self.config['pw']['k_points'])== numpy.ndarray
+        writes.write_k_grid(self.file_path, self.config['pw']['k_points'])
     else:
         writes.write_k_points(self.file_path, self.config['pw']['k_points'])
     #Hubbard Check

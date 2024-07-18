@@ -121,13 +121,17 @@ class project:
     def make_layer(self,layer_type='mono',direction='z'):
         if layer_type=='mono':
             self.config['pw']['atomic_positions'] = utils.make_monolayer(self.config['pw']['atomic_positions'],direction)
-    def k_points(self,number):
+    
+    def k_points(self,number,grid=False):
         if type(number) == int :
             self.config['pw']['k_points']=f'{number} {number} {number} 0 0 0'
         elif len(number) == 3:
             self.config['pw']['k_points']=f'{number[0]} {number[1]} {number[2]} 0 0 0'
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
+        if grid!=False:
+            self.config['pw']['k_points']=utils.k_grid(N=number)
+
         
     def atoms(self):
         return self.config['pw']['atomic_positions']
@@ -245,7 +249,7 @@ class project:
         if calculation=='bands':
             self.set_calculation('bands-pp') #set calculation
             generate.input(self) #create input
-            compute.run(self) #run calculation
+            compute.run(self,num_core=1) #run calculation
         elif calculation=='pdos':
             utils.sumpdos(self)
         elif calculation=='kdos':

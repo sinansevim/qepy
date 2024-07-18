@@ -32,6 +32,14 @@ def write_cell_parameters(file, cell):
             file_object.write("\n")
 
 
+def write_k_grid(file,k):
+    with open(file, "a") as file_object:
+        file_object.write("K_POINTS crystal \n")
+        file_object.write(f"{len(k)} \n")
+        for i in k:
+            file_object.write(f"{i[0]} {i[1]} {i[2]} {i[3]} \n")
+
+
 def write_k_points(file, k):
     with open(file, "a") as file_object:
         file_object.write("K_POINTS automatic \n")

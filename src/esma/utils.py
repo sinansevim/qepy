@@ -12,6 +12,10 @@ import math
 import glob
 from . import compute
 from .config import default_config
+import qmsa
+
+def k_grid(N):
+    return qmsa.utils.mesh_cartesian(N,spacing=True)
 
 def shift_cell(atom,cell,direction,vector):
     vacuum_atom = np.dot(atom,cell)+vector
