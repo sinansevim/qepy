@@ -1,13 +1,15 @@
 import subprocess
 
-def run(self):
+def run(self,num_core=False):
+    if num_core==False:
+           num_core=self.num_core
     if self.debug == False:
         print(f'{self.calculation} for {self.job_id} is started')
         if self.gpu==True:
                 p = subprocess.Popen(f"srun --mpi=pmi2 singularity run --nv  /work/bansil/s.sevim/software/qe-gpu/qe-7.1-gpu.sif {self.package}.x -npool {self.num_gpu} -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
         else:
-                p = subprocess.Popen(f"mpirun -np {self.num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                p = subprocess.Popen(f"mpirun -np {num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
         print(f'{self.calculation} for {self.job_id} is finished')
 
