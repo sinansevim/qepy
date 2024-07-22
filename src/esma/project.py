@@ -5,8 +5,8 @@ from . import compute
 from . import kpoints
 from . import plots
 from . import structure
-from . import writes
-from . import check
+from . import export
+from . import checks
 import numpy as np 
 
 class project:
@@ -53,6 +53,10 @@ class project:
             self.package='bands'
         elif calculation_type in ['pdos','kdos']:
             self.package='projwfc'
+        elif calculation_type == 'wannier90':
+            self.package='wannier90'
+        elif calculation_type =='pw2wannier90':
+            self.package='pw2wannier90'
         else:
             self.package=calculation_type
 
@@ -131,6 +135,7 @@ class project:
             raise Exception("K points can be either a number or an array with 3 enteries")
         if grid!=False:
             self.config['pw']['k_points']=utils.k_grid(N=number)
+            self.grid=number
 
         
     def atoms(self):
@@ -244,8 +249,11 @@ class project:
 
     def calculate(self,calculation):
         self.set_calculation(calculation_type=calculation) #set calculation
-        generate.input(self) #create input
-        compute.run(self) #run calculation
+        if calculation=='wannier90':
+            self.run_wannier()
+        else:
+            generate.input(self) #create input
+            compute.run(self) #run calculation
         if calculation=='bands':
             self.set_calculation('bands-pp') #set calculation
             generate.input(self) #create input
@@ -255,7 +263,12 @@ class project:
         elif calculation=='kdos':
             utils.sumkdos(self)
 
-
+    def run_wannier(self):
+        self.set_calculation(calculation_type='pw2wannier90') #set calculation
+        generate.input(self) #create input
+        self.set_calculation(calculation_type='wannier90') #set calculation
+        generate.input(self) #create input
+        compute.run(self)
 
     def check_convergence(self,calculation=False,job_id=False):
         if calculation==False:
@@ -265,11 +278,18 @@ class project:
         path = f'./Projects/{self.project_id}/{job_id}/{calculation}.out'
         if calculation in ['relax','vc-relax']:
             try:
-                isConverged = check.check_relax(path=path)
+                isConverged = utils.check_relax(path=path)
             except:
                 isConverged=False
         return isConverged
 
+    def fermi_energy(self,calculation=False):
+        if calculation==False:
+            calculation='scf'
+        path = f'./Projects/{self.project_id}/{self.job_id}/{calculation}.out'
+        self.fermi = reads.read_efermi(path)
+        return self.fermi
+        
 
 
     def optimize(self,max_iter = 10,calculation=False):
@@ -335,4 +355,4 @@ class project:
         if file_name==False:
             file_name=structure_name
         if format.lower()=='poscar':
-            writes.write_poscar(structure_name=structure_name,atom=atom,cell=cell,file_name=file_name,file_path=file_path)
+            export.exportPoscar(structure_name=structure_name,atom=atom,cell=cell,file_name=file_name,file_path=file_path)

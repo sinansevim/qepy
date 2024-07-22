@@ -16,6 +16,36 @@ def plot(self,calculation,save,xlim=False,ylim=False):
         plot_pdos(self,xlim=xlim,save=save)
     if calculation=='kdos':
         plot_kdos(self,ylim=ylim,save=save)
+    if calculation=='wannier90':
+        plot_wannier90(self,ylim=ylim,save=save)
+
+
+def plot_wannier90(self,ylim,save):
+    data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
+    k = np.unique(data[:, 0])
+    k = k/max(k)
+    bands = np.reshape(data[:, 1], (-1, len(k)))
+    for band in range(len(bands)):
+        plt.plot(k, bands[band, :],c='black',linestyle='--')
+    data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}_band.dat')
+    sym = np.loadtxt(f"./Projects/{self.project_id}/{self.job_id}/{self.job_id}_band.labelinfo.dat",dtype=str)
+    kpt = sym.T[1].astype(int)[-1]
+    k_path = np.linspace(0,1,kpt)
+    ef = self.fermi_energy()
+    for i in range(int(len(data)/kpt)):
+        plt.plot(k_path,data.T[1].reshape(-1,kpt)[i]-ef,c='b')
+    plt.axhline(0,c='r')
+    plt.xticks(sym.T[1].astype(int),sym.T[0])
+    for i in sym.T[1]:
+        plt.axvline(k_path[int(i)-1],c='black')
+    plt.xlim(0,1)
+    if ylim==False:
+        plt.ylim(-5,5)
+    else:
+        plt.ylim(ylim[0],ylim[1])
+    plt.tight_layout()
+    plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/wannier.pdf')
+    plt.show()
 
 def plot_electron(self,ylim=False,show=False,save=True):
     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')

@@ -11,8 +11,17 @@ import copy
 import math
 import glob
 from . import compute
-from .config import default_config
+from .configs.config import defaultConfig
 import qmsa
+
+
+def check_relax(path):
+    lines = open(path, 'r').readlines()
+    for i in lines:
+        if "bfgs failed after" in i:
+            return False
+        if "bfgs converged" in i:
+            return True
 
 def k_grid(N):
     return qmsa.utils.mesh_cartesian(N,spacing=True)
@@ -102,7 +111,7 @@ def get_total_energy(self):
 
 def configure(path):
     if not path:
-        config = default_config
+        config = defaultConfig()
     else:
         with open(path) as f:
             data = f.read()
