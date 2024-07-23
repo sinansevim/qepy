@@ -1,6 +1,4 @@
 from . import utils
-from .generate import create_folders
-
 
 
 def generic_check(self):
@@ -28,6 +26,25 @@ def check_job_id(job_id):
 def check_config(config):
     if config==False:
         raise Exception("Define a configuration")
+
+
+
+
+def create_folders(project_id,job_id):
+    #Create directory for input files
+    try:
+        os.makedirs(f'./Projects/')
+    except:
+        pass
+    try:
+        os.makedirs(f'./Projects/{project_id}')
+        os.makedirs(f'./Projects/{project_id}/{job_id}')
+    except:
+        try:
+            os.makedirs(f'./Projects/{project_id}/{job_id}')
+        except:
+            pass
+
 
 
 def pw_checks(self):

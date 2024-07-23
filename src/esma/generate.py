@@ -3,22 +3,6 @@ from . import scaffold
 from . import reads
 import os
 
-
-def create_folders(project_id,job_id):
-    #Create directory for input files
-    try:
-        os.makedirs(f'./Projects/')
-    except:
-        pass
-    try:
-        os.makedirs(f'./Projects/{project_id}')
-        os.makedirs(f'./Projects/{project_id}/{job_id}')
-    except:
-        try:
-            os.makedirs(f'./Projects/{project_id}/{job_id}')
-        except:
-            pass
-
 def input(self):
     if self.package=='pw':
         pw_checks(self)
