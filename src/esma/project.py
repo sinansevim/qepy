@@ -163,9 +163,6 @@ class project:
         for i,atom in enumerate(shifted):
             for j in range(3):
                 self.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
-
-
-
         self.config['pw']['atomic_positions']
 
 
