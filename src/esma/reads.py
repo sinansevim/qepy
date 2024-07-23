@@ -19,7 +19,8 @@ def read_structure(self,format,path=False,name=False):
             name=project_id
         if not path:
             path='./'
-        cell,atom = read_poscar(f"{path}/{name}")  
+        cell,atom = read_poscar(f"{path}/{name}")
+        self.poscar = f"{path}/{name}"
     if format.lower()=='vc-relax':
         cell, atom = read_vc_relax(f"./Projects/{project_id}/{job_id}/vc-relax.out")
     if format.lower()=='relax':

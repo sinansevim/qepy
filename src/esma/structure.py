@@ -298,8 +298,8 @@ def process_structure_core(  # pylint: disable=too-many-locals,too-many-statemen
       )
 
 
-def primitive(fileContent,fileformat):
-    with open(fileContent) as file:
+def primitive(file_path,fileformat):
+    with open(file_path) as file:
         fileContent = file.read()
     process_structure_core(filecontent=fileContent,fileformat=fileformat)
     structure = process_structure_core(filecontent=fileContent,fileformat=fileformat)
