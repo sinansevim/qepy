@@ -21,17 +21,17 @@ def plot(self,calculation,save,xlim=False,ylim=False):
 
 
 def plot_wannier90(self,ylim,save):
+    ef = self.fermi_energy()
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
     k = np.unique(data[:, 0])
     k = k/max(k)
     bands = np.reshape(data[:, 1], (-1, len(k)))
     for band in range(len(bands)):
-        plt.plot(k, bands[band, :],c='black',linestyle='--')
+        plt.plot(k, bands[band, :]-ef,c='black',linestyle='--')
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}_band.dat')
     sym = np.loadtxt(f"./Projects/{self.project_id}/{self.job_id}/{self.job_id}_band.labelinfo.dat",dtype=str)
     kpt = sym.T[1].astype(int)[-1]
     k_path = np.linspace(0,1,kpt)
-    ef = self.fermi_energy()
     for i in range(int(len(data)/kpt)):
         plt.plot(k_path,data.T[1].reshape(-1,kpt)[i]-ef,c='b')
     plt.axhline(0,c='r')
