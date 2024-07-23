@@ -1,5 +1,5 @@
 from . import utils
-
+import os 
 
 def generic_check(self):
     self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
