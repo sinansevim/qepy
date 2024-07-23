@@ -6,7 +6,7 @@ from . import structure
 def read_input(self,path=False,calculation='scf'):
     config = self.config['pw']
     if path == False:
-        path = f"./Projects/{project_id}/{job_id}/{calculation}"
+        path = f"./Projects/{self.project_id}/{self.job_id}/{self.calculation}"
     cell, atom = structure.input(file_path = path)
     config['cell_parameters'], config['atomic_positions'] = cell,atom
 

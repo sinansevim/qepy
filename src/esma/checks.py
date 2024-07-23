@@ -1,5 +1,5 @@
-from esma import check, utils
-from esma.generate import create_folders
+from . import utils
+from .generate import create_folders
 
 
 
@@ -17,15 +17,15 @@ def wannier90_checks(self):
     self.config[self.package]["num_wann"]  = self.get_nbnd()
 
 
-def project_id(project_id):
+def check_project_id(project_id):
     if (project_id==False):
         raise Exception("Define a project_id")
     
-def job_id(job_id):
+def check_job_id(job_id):
     if (job_id==False):
         raise Exception("Define a job_id")
     
-def config(config):
+def check_config(config):
     if config==False:
         raise Exception("Define a configuration")
 
@@ -35,9 +35,9 @@ def pw_checks(self):
     job_id = self.job_id
     config=self.config['pw']
     calculation=self.calculation
-    check.project_id(project_id)
-    check.job_id(job_id)
-    check.config(config)
+    check_project_id(project_id)
+    check_job_id(job_id)
+    check_config(config)
     config['control']['calculation'] = self.calculation
     # Set outfolders
     create_folders(project_id=project_id,job_id=job_id)
