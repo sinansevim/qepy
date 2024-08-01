@@ -1,15 +1,11 @@
 # Espresso Machine
 Automation library for Quantum Espresso via python
 
-# Start by executing adiabatic.sh
-Edit parameters in the file for local environment. Such as HPC parameters, python, MPI, Quantum Espresso directories
-## Input parameter
-input.json file is supported in Example foldeer
-## Calculation type
-vc-relax, relax, scf, band
-## Degauss parameter
-Fermi-Dirac smearing width in Ry
-## K points
-nx ny nz type mesh grid or k space path
-## Initial guess or poscar
-Read from vc-relax or poscar file
+Start discovering by checking out the Tutorials section for different calculations
+It is suggested to use a virtual environment to avaoid any compatibility issues.
+## Automated Calculation
+Any kind of choosen calculation type will be initialized after automatically generating the input files
+## Parameter Adjustment
+DFT parameters can be adjusted using the functional approach to keep the bugs away
+## Utility Tools
+Various kind of utility tools added to make the workflow smooth
