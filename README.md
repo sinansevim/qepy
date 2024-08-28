@@ -13,7 +13,9 @@ Various kind of utility tools added to make the workflow smooth
 ### How to use
 #### 1. Prepare the python environment for avoiding compatibility issues
   > python -m venv .venv
-  > source .venv/bin/activate
+
+  > source .venv/bin/activate 
+
   > pip install esma
 #### 2. Create work script
 - Initialize model and define paths
