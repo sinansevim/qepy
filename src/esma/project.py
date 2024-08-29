@@ -85,14 +85,18 @@ class project:
         models = [fm,*afm]
         return models
 
-    def band_points(self,path,number,file_path=False,file_name=False,file_format=False):
+    def band_points(self,path,number,file_path=False,file_name=False,points=False):
+        
         self.path=path
-        file_path = f'./Projects/{self.project_id}/{self.job_id}'
-        file_name = f"{self.project_id}_{self.job_id}"
-        self.export_structure(file_path=file_path,file_name=file_name)
-        points = self.get_points(file_path=f'{file_path}/{file_name}.poscar',file_format="vasp-ase")
+        if points==False:
+            file_path = f'./Projects/{self.project_id}/{self.job_id}'
+            file_name = f"{self.project_id}_{self.job_id}"
+            self.export_structure(file_path=file_path,file_name=file_name)
+            points = self.get_points()
+        
         k_path = kpoints.band_input(path,points,number)
         self.config['pw']['k_points_bands'] = k_path
+
 
     def pw(self):
         return self.config['pw']
@@ -244,7 +248,7 @@ class project:
         else:
             reads.read_structure(self,format,name=name,path=path)
 
-    def calculate(self,calculation):
+    def calculate(self,calculation,pp_core=1):
         self.set_calculation(calculation_type=calculation) #set calculation
         if calculation=='wannier90':
             self.run_wannier()
@@ -254,7 +258,7 @@ class project:
         if calculation=='bands':
             self.set_calculation('bands-pp') #set calculation
             generate.input(self) #create input
-            compute.run(self,num_core=1) #run calculation
+            compute.run(self,num_core=pp_core) #run calculation
         elif calculation=='pdos':
             utils.sumpdos(self)
         elif calculation=='kdos':
