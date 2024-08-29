@@ -29,7 +29,7 @@ class project:
 
     def energy(self):
         return utils.get_total_energy(self)
-
+    
     def from_poscar(self,directory=False):
         if directory==False:
             self.poscar=f'./Structures/{self.project_id}.poscar'
