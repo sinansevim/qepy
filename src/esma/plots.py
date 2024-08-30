@@ -5,9 +5,9 @@ from . import reads
 from . import utils
 
 
-def plot(self,calculation,save,xlim=False,ylim=False):
+def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=False):
     if calculation=='electron':
-        plot_electron(self,ylim=ylim,save=save)
+        plot_electron(self,ylim=ylim,save=save,figsize=figsize,save_name=save_name)
     if calculation=='phonon':
         plot_phonon(self,save=save)
     if calculation=='dos':
@@ -47,10 +47,12 @@ def plot_wannier90(self,ylim,save):
     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/wannier.pdf')
     plt.show()
 
-def plot_electron(self,ylim=False,show=False,save=True):
+def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=False):
     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
-    fig = plt.figure(figsize=(8,6))
+    if figsize==False:
+        figsize=(8,6)
+    fig = plt.figure(figsize=figsize)
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
     k = np.unique(data[:, 0])
     bands = np.reshape(data[:, 1], (-1, len(k)))
@@ -63,8 +65,12 @@ def plot_electron(self,ylim=False,show=False,save=True):
     plt.text(-0.2, float(fermi), r'$\epsilon_{Fermi}$',color='red')
     plt.ylim(ylim[0],ylim[1])
     plt.xlim(sym[0],sym[-1])
+    plt.tight_layout()
     if save==True:
-        plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/band.png')
+        if save_name !=False:
+            plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/{save_name}.png')
+        else:
+            plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/band.png')
     if show==True:
         return fig
     

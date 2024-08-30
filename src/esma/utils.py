@@ -321,3 +321,15 @@ def minimum_energy(models):
     min_state= np.argmin(energies)
     print(labels[min_state])
     return models[min_state]
+
+
+
+def strain(initial_cell,axis,value):
+    final_cell = copy.deepcopy(initial_cell)
+    if 'x' in axis:
+        final_cell[0] *= value
+    if 'y' in axis:
+        final_cell[1] *= value
+    if 'z' in axis:
+        final_cell[3] *= value
+    return final_cell

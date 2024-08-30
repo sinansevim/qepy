@@ -169,9 +169,13 @@ class project:
                 self.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
         self.config['pw']['atomic_positions']
 
+    def strain(self,axis,value):
+        initial_cell = np.array(self.cell()).astype(float)
+        final_cell = utils.strain(initial_cell,axis,value)
+        self.config['pw']['cell_parameters'] = final_cell
 
-    def plot(self,calculation,save=False,xlim=False,ylim=False):
-        plots.plot(self,calculation,save,xlim,ylim)
+    def plot(self,calculation,save=False,xlim=False,ylim=False,figsize=False,save_name=False):
+        plots.plot(self,calculation,save,xlim,ylim,figsize,save_name)
 
     def nbnd(self,number):
         self.config['pw']['system']['nbnd']=number
@@ -332,7 +336,12 @@ class project:
         # elif parameter=='kpoints':
         #     result = utils.test_k(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
         return result
-    
+
+    # def screen(self,parameter_name,begin,end,steps):
+    #     if parameter_name==U:
+
+
+
     def set_q(self,nq1=2,nq2=2,nq3=2):
         self.config['ph']['inputph']['nq1']=nq1
         self.config['ph']['inputph']['nq2']=nq2
