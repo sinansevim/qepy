@@ -9,7 +9,7 @@ def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=Fal
     if calculation=='electron':
         plot_electron(self,ylim=ylim,save=save,figsize=figsize,save_name=save_name,title=title)
     if calculation=='phonon':
-        plot_phonon(self,save=save)
+        plot_phonon(self,save=save,title=title)
     if calculation=='dos':
         plot_dos(self,xlim=xlim,save=save)
     if calculation=='pdos':
@@ -77,11 +77,11 @@ def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=F
         return fig
     
 
-def plot_phonon(self,save=True):
+def plot_phonon(self,save=True,title=False):
     sym = []
     point = [0]
     for k,i in enumerate(self.config['pw']['k_points_bands']):
-        sym.append(i['label'].split()[1])
+        sym.append(i['label'])
         if k!=len(self.config['pw']['k_points_bands'])-1:
             point.append(point[k]+int(i['number']))
     freq = np.loadtxt(f"./Projects/{self.project_id}/{self.job_id}/{self.job_id}.freq.gp")
@@ -99,6 +99,9 @@ def plot_phonon(self,save=True):
     plt.ylim(0,)
     plt.xlim(0,ph_path[-1])
     plt.ylabel("ω (meV)",fontsize=15)
+    plt.tight_layout
+    if title!=False:
+        plt.title(title)
     if save==True:
         plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/phonon_band.png')
     plt.show()
