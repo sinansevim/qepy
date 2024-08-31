@@ -85,8 +85,13 @@ class project:
         models = [fm,*afm]
         return models
 
+
+    def press_conv_thr(self,value):
+        self.config['pw']['cell']['press_conv_thr'] = value
+
+
+
     def band_points(self,path,number,file_path=False,file_name=False,points=False):
-        
         self.path=path
         if points==False:
             file_path = f'./Projects/{self.project_id}/{self.job_id}'
@@ -361,7 +366,7 @@ class project:
             if self.job_id=='results':
                 structure_name = self.project_id
             else:
-                structure_name = self.project_id+self.job_id
+                structure_name = str(self.project_id)+str(self.job_id)
         if file_name==False:
             file_name=structure_name
         if format.lower()=='poscar':
