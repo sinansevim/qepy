@@ -174,8 +174,8 @@ class project:
         final_cell = utils.strain(initial_cell,axis,value)
         self.config['pw']['cell_parameters'] = final_cell
 
-    def plot(self,calculation,save=False,xlim=False,ylim=False,figsize=False,save_name=False):
-        plots.plot(self,calculation,save,xlim,ylim,figsize,save_name)
+    def plot(self,calculation,save=False,xlim=False,ylim=False,figsize=False,save_name=False,title=False):
+        plots.plot(self,calculation=calculation,save=save,xlim=xlim,ylim=ylim,figsize=figsize,save_name=save_name,title=title)
 
     def nbnd(self,number):
         self.config['pw']['system']['nbnd']=number

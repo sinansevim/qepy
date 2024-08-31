@@ -12,7 +12,7 @@ def defaultConfig():
     "hubbard": { "projection": "atomic", "terms": [] }
   },
   "dos": { "dos": { "emin": "-20.0", "emax": "20.0" } },
-  "bands": { "bands": {} },
+  "bands": { "bands": {"lsym":"false"} },
   "projwfc": { "projwfc": {} },
   "ph": { "inputph": { "ldisp": "true", "nq1": "1", "nq2": "1", "nq3": "1" } },
   "q2r": { "input": { "zasr": "simple" } },
