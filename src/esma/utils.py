@@ -331,5 +331,5 @@ def strain(initial_cell,axis,value):
     if 'y' in axis:
         final_cell[1] *= value
     if 'z' in axis:
-        final_cell[3] *= value
+        final_cell[2] *= value
     return final_cell
