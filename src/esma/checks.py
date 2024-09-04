@@ -13,6 +13,11 @@ def pw2wannier90_checks(self):
 
 def wannier90_checks(self):
     self.config[self.package]["num_wann"]  = self.get_nbnd()
+    try:
+        if self.config['pw']['system']['lspinorb'] == True:
+            self.config[self.package]["spinors"]  = 'true'
+    except:
+       pass
 
 
 def check_project_id(project_id):
