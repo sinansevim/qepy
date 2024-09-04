@@ -143,7 +143,7 @@ class project:
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
         if grid!=False:
-            self.config['pw']['k_points']=utils.k_grid(N=number)
+            self.config['pw']['k_points']=utils.k_grid(num_points=number)
             self.grid=number
 
         
