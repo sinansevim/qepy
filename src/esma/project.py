@@ -85,14 +85,23 @@ class project:
         models = [fm,*afm]
         return models
 
-    def band_points(self,path,number,file_path=False,file_name=False,file_format=False):
+
+    def press_conv_thr(self,value):
+        self.config['pw']['cell']['press_conv_thr'] = value
+
+
+
+    def band_points(self,path,number,file_path=False,file_name=False,points=False):
         self.path=path
-        file_path = f'./Projects/{self.project_id}/{self.job_id}'
-        file_name = f"{self.project_id}_{self.job_id}"
-        self.export_structure(file_path=file_path,file_name=file_name)
-        points = self.get_points(file_path=f'{file_path}/{file_name}.poscar',file_format="vasp-ase")
+        if points==False:
+            file_path = f'./Projects/{self.project_id}/{self.job_id}'
+            file_name = f"{self.project_id}_{self.job_id}"
+            self.export_structure(file_path=file_path,file_name=file_name)
+            points = self.get_points()
+        
         k_path = kpoints.band_input(path,points,number)
         self.config['pw']['k_points_bands'] = k_path
+
 
     def pw(self):
         return self.config['pw']
@@ -134,7 +143,7 @@ class project:
         else:
             raise Exception("K points can be either a number or an array with 3 enteries")
         if grid!=False:
-            self.config['pw']['k_points']=utils.k_grid(N=number)
+            self.config['pw']['k_points']=utils.k_grid(num_points=number)
             self.grid=number
 
         
@@ -165,9 +174,13 @@ class project:
                 self.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
         self.config['pw']['atomic_positions']
 
+    def strain(self,axis,value):
+        initial_cell = np.array(self.cell()).astype(float)
+        final_cell = utils.strain(initial_cell,axis,value)
+        self.config['pw']['cell_parameters'] = final_cell
 
-    def plot(self,calculation,save=False,xlim=False,ylim=False):
-        plots.plot(self,calculation,save,xlim,ylim)
+    def plot(self,calculation,save=False,xlim=False,ylim=False,figsize=False,save_name=False,title=False):
+        plots.plot(self,calculation=calculation,save=save,xlim=xlim,ylim=ylim,figsize=figsize,save_name=save_name,title=title)
 
     def nbnd(self,number):
         self.config['pw']['system']['nbnd']=number
@@ -244,7 +257,7 @@ class project:
         else:
             reads.read_structure(self,format,name=name,path=path)
 
-    def calculate(self,calculation):
+    def calculate(self,calculation,pp_core=1):
         self.set_calculation(calculation_type=calculation) #set calculation
         if calculation=='wannier90':
             self.run_wannier()
@@ -254,7 +267,7 @@ class project:
         if calculation=='bands':
             self.set_calculation('bands-pp') #set calculation
             generate.input(self) #create input
-            compute.run(self,num_core=1) #run calculation
+            compute.run(self,num_core=pp_core) #run calculation
         elif calculation=='pdos':
             utils.sumpdos(self)
         elif calculation=='kdos':
@@ -328,7 +341,12 @@ class project:
         # elif parameter=='kpoints':
         #     result = utils.test_k(self=self,start=start,end=end,step=step,num_core=num_core,debug=debug)
         return result
-    
+
+    # def screen(self,parameter_name,begin,end,steps):
+    #     if parameter_name==U:
+
+
+
     def set_q(self,nq1=2,nq2=2,nq3=2):
         self.config['ph']['inputph']['nq1']=nq1
         self.config['ph']['inputph']['nq2']=nq2
@@ -348,7 +366,7 @@ class project:
             if self.job_id=='results':
                 structure_name = self.project_id
             else:
-                structure_name = self.project_id+self.job_id
+                structure_name = str(self.project_id)+str(self.job_id)
         if file_name==False:
             file_name=structure_name
         if format.lower()=='poscar':

@@ -5,11 +5,11 @@ from . import reads
 from . import utils
 
 
-def plot(self,calculation,save,xlim=False,ylim=False):
+def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=False,title=False):
     if calculation=='electron':
-        plot_electron(self,ylim=ylim,save=save)
+        plot_electron(self,ylim=ylim,save=save,figsize=figsize,save_name=save_name,title=title)
     if calculation=='phonon':
-        plot_phonon(self,save=save)
+        plot_phonon(self,save=save,title=title)
     if calculation=='dos':
         plot_dos(self,xlim=xlim,save=save)
     if calculation=='pdos':
@@ -47,10 +47,12 @@ def plot_wannier90(self,ylim,save):
     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/wannier.pdf')
     plt.show()
 
-def plot_electron(self,ylim=False,show=False,save=True):
+def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=False,title=False):
     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
-    fig = plt.figure(figsize=(8,6))
+    if figsize==False:
+        figsize=(8,6)
+    fig = plt.figure(figsize=figsize)
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
     k = np.unique(data[:, 0])
     bands = np.reshape(data[:, 1], (-1, len(k)))
@@ -63,17 +65,23 @@ def plot_electron(self,ylim=False,show=False,save=True):
     plt.text(-0.2, float(fermi), r'$\epsilon_{Fermi}$',color='red')
     plt.ylim(ylim[0],ylim[1])
     plt.xlim(sym[0],sym[-1])
+    if title!=False:
+        plt.title(title)
+    plt.tight_layout()
     if save==True:
-        plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/band.png')
+        if save_name !=False:
+            plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/{save_name}.png')
+        else:
+            plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/band.png')
     if show==True:
         return fig
     
 
-def plot_phonon(self,save=True):
+def plot_phonon(self,save=True,title=False):
     sym = []
     point = [0]
     for k,i in enumerate(self.config['pw']['k_points_bands']):
-        sym.append(i['label'].split()[1])
+        sym.append(i['label'])
         if k!=len(self.config['pw']['k_points_bands'])-1:
             point.append(point[k]+int(i['number']))
     freq = np.loadtxt(f"./Projects/{self.project_id}/{self.job_id}/{self.job_id}.freq.gp")
@@ -91,6 +99,9 @@ def plot_phonon(self,save=True):
     plt.ylim(0,)
     plt.xlim(0,ph_path[-1])
     plt.ylabel("ω (meV)",fontsize=15)
+    plt.tight_layout
+    if title!=False:
+        plt.title(title)
     if save==True:
         plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/phonon_band.png')
     plt.show()
