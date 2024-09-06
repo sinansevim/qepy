@@ -131,6 +131,14 @@ class project:
         self.config['pw']['control']['etot_conv_thr'] = value
     def forc_conv_thr(self,value):
         self.config['pw']['control']['forc_conv_thr'] = value
+
+    def scdm_mu(self,value):
+        self.config['pw2wannier90']['inputpp']['scdm_mu'] = value
+
+    def scdm_sigma(self,value):
+        self.config['pw2wannier90']['inputpp']['scdm_sigma'] = value
+
+
     def make_layer(self,layer_type='mono',direction='z'):
         if layer_type=='mono':
             self.config['pw']['atomic_positions'] = utils.make_monolayer(self.config['pw']['atomic_positions'],direction)
