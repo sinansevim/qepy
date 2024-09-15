@@ -12,7 +12,6 @@ import math
 import glob
 from . import compute
 from .configs.config import defaultConfig
-import qmsa
 
 
 def check_relax(path):
