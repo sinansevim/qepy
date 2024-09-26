@@ -6,8 +6,14 @@ def generic_check(self):
     self.config[self.package][self.package]["prefix"] = self.job_id
     self.config[self.package][self.package][f"fil{self.package}"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.package}.dat'
 
+
+def hp_checks(self):
+    self.config[self.package]["inputhp"]["prefix"] = self.job_id
+    self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+
+
 def pw2wannier90_checks(self):
-    self.config[self.package]["inputpp"]["outdir"]    = f"./"
+    self.config[self.package]["inputpp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     self.config[self.package]["inputpp"]["prefix"]    = self.job_id
     self.config[self.package]["inputpp"]["seedname"]  = self.job_id
 

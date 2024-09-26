@@ -5,9 +5,9 @@ from . import reads
 from . import utils
 
 
-def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=False,title=False):
+def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=False,title=False,remove_fermi=True):
     if calculation=='electron':
-        plot_electron(self,ylim=ylim,save=save,figsize=figsize,save_name=save_name,title=title)
+        plot_electron(self,ylim=ylim,save=save,figsize=figsize,save_name=save_name,title=title,remove_fermi=remove_fermi)
     if calculation=='phonon':
         plot_phonon(self,save=save,title=title)
     if calculation=='dos':
@@ -47,7 +47,7 @@ def plot_wannier90(self,ylim,save):
     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/wannier.pdf')
     plt.show()
 
-def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=False,title=False):
+def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=False,title=False,remove_fermi=True):
     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
     if figsize==False:
@@ -56,6 +56,8 @@ def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=F
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
     k = np.unique(data[:, 0])
     bands = np.reshape(data[:, 1], (-1, len(k)))
+    if remove_fermi==True:
+        bands -= fermi
     for band in range(len(bands)):
         plt.plot(k, bands[band, :],c='black')
     plt.xticks(sym,self.path)
