@@ -2,6 +2,9 @@ import json
 
 def defaultConfig():
   config = {
+  "metadata":{
+
+    },
   "pw": {
     "control": { "pseudo_dir": "./pseudos/NC" },
     "system": { "degauss": "0.1", "ecutwfc": "20", "occupations": "smearing" },
@@ -40,9 +43,15 @@ def defaultConfig():
     "num_print_cycles": "10",
     "geninterp": "true",
     "auto_projections": "true",
+    "write_hr": "true",
     "bands_plot": "true",
     "bands_num_points" : "200"
-
+  },
+  "hp":{
+    "inputhp":{
+      "conv_thr_chi":"1e-6",
+      "nq1" :"2", "nq2" : "2", "nq3" :"2",
+    }
   }
 }
   return config

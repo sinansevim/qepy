@@ -1,4 +1,4 @@
-from .checks import bands_checks, generic_check, matdyn_checks, ph_checks, projwfc_checks, pw_checks, q2r_checks, pw2wannier90_checks, wannier90_checks
+from .checks import bands_checks, generic_check, matdyn_checks, ph_checks, projwfc_checks, pw_checks, q2r_checks, pw2wannier90_checks, wannier90_checks, hp_checks
 from . import scaffold
 from . import reads
 import os
@@ -20,6 +20,8 @@ def input(self):
         wannier90_checks(self)
     elif self.package=='pw2wannier90':
         pw2wannier90_checks(self)
+    elif self.package=='hp':
+        hp_checks(self)
     else:
         generic_check(self)
     scaffold.constructor(self)
