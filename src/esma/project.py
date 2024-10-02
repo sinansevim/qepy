@@ -310,7 +310,7 @@ class project:
         
 
 
-    def optimize(self,max_iter = 10,calculation=False):
+    def optimize(self,calculation=False,max_iter = 1):
         if calculation==False:
             calculation=self.calculation
         for i in range(max_iter):

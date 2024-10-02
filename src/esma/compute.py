@@ -2,6 +2,12 @@ import subprocess
 from .commands import wannier_stack
 
 def run(self,num_core=False):
+
+    try:
+        path = self.config['metadata']['binary_path']
+    except:
+        path = False
+
     if num_core==False:
            num_core=self.num_core
     if self.debug == False:
@@ -13,7 +19,10 @@ def run(self,num_core=False):
                 if self.package == "wannier90":
                         wannier_stack.full_stack(self)
                 else:
-                        p = subprocess.Popen(f"mpirun -np {num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                        if path ==False:
+                                p = subprocess.Popen(f"mpirun -np {num_core} {self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                        else :
+                                   p = subprocess.Popen(f"mpirun -np {num_core} {path}/{self.package}.x -inp ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in > ./Projects/{self.project_id}/{self.job_id}/{self.calculation}.out ", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                         p.wait()
         print(f'{self.calculation} for {self.job_id} is finished')
 
