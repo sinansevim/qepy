@@ -52,6 +52,11 @@ def defaultConfig():
       "conv_thr_chi":"1e-6",
       "nq1" :"2", "nq2" : "2", "nq3" :"2",
     }
+  },
+  "d3hess":{
+    "input":{
+      "step":"1e-3"
+    }
   }
 }
   return config
