@@ -10,8 +10,13 @@ import untangle
 import copy
 import math
 import glob
+import multiprocessing
+
 from . import compute
 from .configs.config import defaultConfig
+
+def get_cpu_count():
+    return multiprocessing.cpu_count()
 
 
 def check_relax(path):
@@ -60,6 +65,26 @@ def shift_cell(atom,cell,direction,vector):
 
 def shift_frac(atoms,vector):
     return np.mod(atoms+vector,1)
+
+
+
+
+def create_disorder(self,scale,number_of_states):
+    states = []
+    self.job_id = "groud_state"
+    states.append(self)
+    for k in range(number_of_states):
+        state = copy.deepcopy(self)
+        state.job_id = f"state_{k+1}"
+        num_atoms = len(state.atoms())
+        modulation = np.random.normal(loc=0.0, scale=scale, size=(num_atoms,3))
+        atoms = np.array(state.config['pw']['atomic_positions']).T[1:].T.astype(float)
+        shifted = atoms+modulation
+        for i,atom in enumerate(shifted):
+            for j in range(3):
+                state.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
+        states.append(state)
+    return states
 
 def make_monolayer(atoms,direction='z'):
     direction = direction.lower()

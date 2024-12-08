@@ -24,8 +24,13 @@ class project:
         self.gpu = False
         self.num_core=1
 
-    def set_cores(self,value):
-        self.num_core=value
+    def set_cores(self,value=False):
+        if value==False:
+            self.num_core = utils.get_cpu_count()-4
+            if self.num_core < 1:
+                self.num_core =1 
+        else:
+            self.num_core=value
 
     def energy(self):
         return utils.get_total_energy(self)
@@ -180,7 +185,10 @@ class project:
         for i,atom in enumerate(shifted):
             for j in range(3):
                 self.config['pw']['atomic_positions'][i][1+j]=atom[j].astype(str)
-        self.config['pw']['atomic_positions']
+        # self.config['pw']['atomic_positions']
+
+    def disorder(self,number_of_states,scale=0.005):
+        return utils.create_disorder(self,scale=scale,number_of_states=number_of_states)
 
     def strain(self,axis,value):
         initial_cell = np.array(self.cell()).astype(float)
