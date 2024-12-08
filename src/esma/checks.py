@@ -6,6 +6,12 @@ def generic_check(self):
     self.config[self.package][self.package]["prefix"] = self.job_id
     self.config[self.package][self.package][f"fil{self.package}"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.package}.dat'
 
+def d3hess_checks(self):
+    self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    self.config[self.package]["input"]["prefix"] = self.job_id
+    self.config[self.package]["input"][f"filhess"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.hess'
+    self.config['ph']['inputph']['dftd3_hess'] = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.hess'
+
 
 def hp_checks(self):
     self.config[self.package]["inputhp"]["prefix"] = self.job_id
