@@ -2,12 +2,18 @@ from . import utils
 import os 
 
 def generic_check(self):
-    self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
     self.config[self.package][self.package]["prefix"] = self.job_id
     self.config[self.package][self.package][f"fil{self.package}"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.package}.dat'
 
 def d3hess_checks(self):
-    self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
     self.config[self.package]["input"]["prefix"] = self.job_id
     self.config[self.package]["input"][f"filhess"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.hess'
     self.config['ph']['inputph']['dftd3_hess'] = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.hess'
@@ -15,11 +21,17 @@ def d3hess_checks(self):
 
 def hp_checks(self):
     self.config[self.package]["inputhp"]["prefix"] = self.job_id
-    self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
 
 
 def pw2wannier90_checks(self):
-    self.config[self.package]["inputpp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config[self.package]["inputpp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config[self.package]["inputpp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
     self.config[self.package]["inputpp"]["prefix"]    = self.job_id
     self.config[self.package]["inputpp"]["seedname"]  = self.job_id
 
@@ -75,7 +87,11 @@ def pw_checks(self):
     config['control']['calculation'] = self.calculation
     # Set outfolders
     create_folders(project_id=project_id,job_id=job_id)
-    config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
+    if self.outdir==False:
+        config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
+    else:
+        config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/{self.outdir}"
+    
 
     cell, atoms = config['cell_parameters'], config['atomic_positions']
 
@@ -102,19 +118,30 @@ def projwfc_checks(self):
         self.config[self.package][self.package]["filpdos"]  = f'./Projects/{self.project_id}/{self.job_id}/dos.k'
         self.config[self.package][self.package]["kresolveddos"]  = 'true'
         self.config[self.package][self.package]["degauss"]  =  self.config['pw']['system']['degauss']
-    self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
     self.config[self.package][self.package]["prefix"] = self.job_id
 
 
 def bands_checks(self):
-    self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+    
     self.config[self.package][self.package]["prefix"] = self.job_id
     self.config[self.package][self.package][f"filband"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.package}.dat'
 
 
 
 def ph_checks(self):
-    self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    if self.outdir==False:
+        self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+    else:
+        self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+    
     self.config['ph']["inputph"]['prefix'] = self.job_id
     self.config['ph']["inputph"]["fildyn"]= f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.dyn'
 

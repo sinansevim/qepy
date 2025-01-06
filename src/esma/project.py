@@ -23,6 +23,7 @@ class project:
         self.magnetism=False
         self.gpu = False
         self.num_core=1
+        self.outdir=False
 
     def set_cores(self,value=False):
         if value==False:
@@ -203,7 +204,8 @@ class project:
     
     def get_nbnd(self):
         return int(reads.read_num_bands(self))
-    
+    def vdw_corr(self,value):
+        self.config['pw']['system']['vdw_corr']=value
     def mixing_mode(self,value):
         self.config['pw']['electrons']['mixing_mode']=value
     def smearing(self,value):
@@ -250,8 +252,12 @@ class project:
         try:
             k_points = structure.get_k(file_path,file_format)
         except:
-            file_path=f'./Projects/{self.project_id}/{self.job_id}/vc-relax.in'
-            k_points = structure.get_k(file_path,file_format)
+            try:
+                file_path=f'./Projects/{self.project_id}/{self.job_id}/vc-relax.in'
+                k_points = structure.get_k(file_path,file_format)
+            except:
+                file_path=f'./Projects/{self.project_id}/{self.job_id}/relax.in'
+                k_points = structure.get_k(file_path,file_format)
         self.points=k_points
         return k_points
     
@@ -267,10 +273,12 @@ class project:
     def cell_dof(self,value):
         self.config['pw']['cell']['cell_dofree'] = value
         
-    def get_structure(self,format,name=False,path=False,project_id=False,job_id=False,config=False):
+    def get_structure(self,format=False,name=False,path=False,project_id=False,job_id=False,config=False):
         if format == 'input':
             reads.read_input(self,path)
         else:
+            if format==False and path!=False:
+                format = path.split('.')[-1].lower()
             reads.read_structure(self,format,name=name,path=path)
 
     def calculate(self,calculation,pp_core=1):
@@ -387,3 +395,13 @@ class project:
             file_name=structure_name
         if format.lower()=='poscar':
             export.exportPoscar(structure_name=structure_name,atom=atom,cell=cell,file_name=file_name,file_path=file_path)
+
+    def supercell(self,scaling_matrix,path=False,fmt=False):
+        if path==False:
+            if fmt=='poscar':
+                path= f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.poscar'
+            else:
+                path= f'./Projects/{self.project_id}/{self.job_id}/{self.calculation}.in'
+        cell,atoms = utils.supercell(path,scaling_matrix)
+        self.config['pw']['atomic_positions'] = atoms
+        self.config['pw']['cell_parameters'] = cell

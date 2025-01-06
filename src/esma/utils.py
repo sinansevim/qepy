@@ -11,7 +11,8 @@ import copy
 import math
 import glob
 import multiprocessing
-
+from ase.build import make_supercell
+from ase.io import read
 from . import compute
 from .configs.config import defaultConfig
 
@@ -71,8 +72,6 @@ def shift_frac(atoms,vector):
 
 def create_disorder(self,scale,number_of_states):
     states = []
-    self.job_id = "groud_state"
-    states.append(self)
     for k in range(number_of_states):
         state = copy.deepcopy(self)
         state.job_id = f"state_{k+1}"
@@ -376,3 +375,14 @@ def strain(initial_cell,axis,value):
     if 'z' in axis:
         final_cell[2] *= value
     return final_cell
+
+
+def supercell(path,scaling_matrix):
+    atoms = read(filename=path)
+    supercell = make_supercell(atoms, scaling_matrix)
+    cell = supercell.get_cell()[:].astype(str).tolist()
+    atoms = []
+    for i, symbol in enumerate(supercell.symbols):
+        fractional_coords = supercell.get_scaled_positions()[i]
+        atoms.append([symbol]+fractional_coords.astype(str).tolist())
+    return cell,atoms
