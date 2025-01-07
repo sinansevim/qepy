@@ -24,12 +24,12 @@ model = init_model()
 model.optimize('vc-relax')
 # model.optimize('relax')
 
-model.k_points([8,8,8]) #Set number of k points
-model.conv_thr(1e-12) #Set convergence threshold
-model.ph_thr(1e-16) #Set convergence threshold
+model.k_points([4,4,4]) #Set number of k points
+model.conv_thr(1e-10) #Set convergence threshold
+model.ph_thr(1e-14) #Set convergence threshold
 
 model.calculate('scf')
-model.set_q(nq1=4,nq2=4,nq3=4) #Set parameters
+model.set_q(nq1=2,nq2=2,nq3=2) #Set parameters
 model.calculate('ph')
 
 model.calculate('q2r') #Run calculation

@@ -22,14 +22,12 @@ def symmetry_coordinate(point):
 #     return parameter
 
 
-def band_input(path,points,num_points):
+def band_input(label,points,num_points):
     parameter = []
-    for k,i in enumerate(path):
-        for j in points:
-            if i.upper() == j[0].upper():
-                if k == len(path)-1:
-                    input_line = {'x':str(j[1]),'y':str(j[2]),'z':str(j[3]),'number':str(1),'label':f"{j[0].upper()}"}
-                else:
-                    input_line = {'x':str(j[1]),'y':str(j[2]),'z':str(j[3]),'number':str(num_points),'label':f"{j[0].upper()}"}
-                parameter.append(input_line)
+    for k,j in enumerate(points):
+        if k == len(label)-1:
+            input_line = {'x':str(j[0]),'y':str(j[1]),'z':str(j[2]),'number':str(1),'label':f"{label[k].upper()}"}
+        else:
+            input_line = {'x':str(j[0]),'y':str(j[1]),'z':str(j[2]),'number':str(num_points),'label':f"{label[k].upper()}"}
+        parameter.append(input_line)
     return parameter

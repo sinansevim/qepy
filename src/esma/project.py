@@ -18,6 +18,7 @@ class project:
         self.calculation=False
         self.job_id = 'results'
         self.path = False
+        self.label=False
         self.poscar= False
         self.debug = False
         self.magnetism=False
@@ -97,15 +98,15 @@ class project:
 
 
 
-    def band_points(self,path,number,file_path=False,file_name=False,points=False):
-        self.path=path
+    def band_points(self,label,number,file_path=False,file_name=False,points=False):
+        self.label=label
         if points==False:
             file_path = f'./Projects/{self.project_id}/{self.job_id}'
             file_name = f"{self.project_id}_{self.job_id}"
             self.export_structure(file_path=file_path,file_name=file_name)
             points = self.get_points()
         
-        k_path = kpoints.band_input(path,points,number)
+        k_path = kpoints.band_input(label,points,number)
         self.config['pw']['k_points_bands'] = k_path
 
 

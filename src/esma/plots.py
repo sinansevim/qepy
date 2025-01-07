@@ -60,7 +60,7 @@ def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=F
         bands -= fermi
     for band in range(len(bands)):
         plt.plot(k, bands[band, :],c='black')
-    plt.xticks(sym,self.path)
+    plt.xticks(sym,self.label)
     for i in range(1,len(sym)-1):
         plt.axvline(sym[i],c='black')
     plt.axhline(float(fermi),c='red')
@@ -209,7 +209,7 @@ def plot_kdos(self,ylim=False,save=False):
         sym =sym/max(sym)*max(k)
         fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
         plt.pcolormesh(k, e, dos.T, cmap='magma', shading='auto')
-        plt.xticks(sym,self.path)
+        plt.xticks(sym,self.label)
         for i in range(1,len(sym)-1):
             plt.axvline(sym[i],c='white')
         plt.axhline(float(fermi),c='white')
