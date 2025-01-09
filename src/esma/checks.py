@@ -29,9 +29,9 @@ def hp_checks(self):
 
 def pw2wannier90_checks(self):
     if self.outdir==False:
-        self.config[self.package]["inputpp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
+        self.config[self.package]["inputpp"]["outdir"] = f"./"
     else:
-        self.config[self.package]["inputpp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config[self.package]["inputpp"]["outdir"] = f"./{self.outdir}"
     self.config[self.package]["inputpp"]["prefix"]    = self.job_id
     self.config[self.package]["inputpp"]["seedname"]  = self.job_id
 
