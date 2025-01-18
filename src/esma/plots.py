@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import glob
 from . import reads
 from . import utils
+from .plotting import kdos
 
-
-def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=False,title=False,remove_fermi=True):
+def plot(self,calculation,save,atom,orbital,xlim=False,ylim=False,figsize=False,save_name=False,title=False,remove_fermi=True):
     if calculation=='electron':
         plot_electron(self,ylim=ylim,save=save,figsize=figsize,save_name=save_name,title=title,remove_fermi=remove_fermi)
     if calculation=='phonon':
@@ -15,7 +15,7 @@ def plot(self,calculation,save,xlim=False,ylim=False,figsize=False,save_name=Fal
     if calculation=='pdos':
         plot_pdos(self,xlim=xlim,save=save)
     if calculation=='kdos':
-        plot_kdos(self,ylim=ylim,save=save)
+        plot_kdos(self,atom,orbital,ylim=ylim,save=save)
     if calculation=='wannier90':
         plot_wannier90(self,ylim=ylim,save=save)
 
@@ -58,6 +58,7 @@ def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=F
     bands = np.reshape(data[:, 1], (-1, len(k)))
     if remove_fermi==True:
         bands -= fermi
+        fermi = 0
     for band in range(len(bands)):
         plt.plot(k, bands[band, :],c='black')
     plt.xticks(sym,self.label)
@@ -181,40 +182,46 @@ def plot_pdos(self,xlim=False,save=False):
     plt.legend(frameon=False)
     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/pdos.png')
 
-def plot_kdos(self,ylim=False,save=False):
-    files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/sumkdos*')
-    files.append(f'./Projects/{self.project_id}/{self.job_id}/dos.k.pdos_tot')
+def plot_kdos(self,atom,orbital,ylim=False,save=True):
+    directory = f'Projects/{self.project_id}/{self.job_id}'
+    sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
+    
+    labels= self.label
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
-    for i in files:
-        parts = i.split("_")
-        if len(parts)==2:
-            label='Total'
-        else:
-            atom = parts[1]
-            orbital = parts[2].split('.')[0]
-            label=atom+'-'+orbital
-        # print(label)
-        data = np.loadtxt(i)
+    kdos.plot_k_resolved_pdos(directory, atom, orbital, fermi=fermi, sym=sym, labels=labels)
+    # files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/sumkdos*')
+    # files.append(f'./Projects/{self.project_id}/{self.job_id}/dos.k.pdos_tot')
+    # fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
+    # for i in files:
+    #     parts = i.split("_")
+    #     if len(parts)==2:
+    #         label='Total'
+    #     else:
+    #         atom = parts[1]
+    #         orbital = parts[2].split('.')[0]
+    #         label=atom+'-'+orbital
+    #     # print(label)
+    #     data = np.loadtxt(i)
 
-        k = np.unique(data[:, 0])  # k values
-        e = np.unique(data[:, 1])  # dos energy values
+    #     k = np.unique(data[:, 0])  # k values
+    #     e = np.unique(data[:, 1])  # dos energy values
 
-        dos = np.zeros([len(k), len(e)])
+    #     dos = np.zeros([len(k), len(e)])
 
-        for i in range(len(data)):
-            e_index = int(i % len(e))
-            k_index = int(data[i][0] - 1)
-            dos[k_index, e_index] = data[i][2]
-        sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
-        sym =sym/max(sym)*max(k)
-        fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
-        plt.pcolormesh(k, e, dos.T, cmap='magma', shading='auto')
-        plt.xticks(sym,self.label)
-        for i in range(1,len(sym)-1):
-            plt.axvline(sym[i],c='white')
-        plt.axhline(float(fermi),c='white')
-        if ylim:
-            plt.ylim(ylim)
-        plt.ylabel('Energy (eV)')
-        plt.title(label)
-        plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/kdos_{label}.png')
+    #     for i in range(len(data)):
+    #         e_index = int(i % len(e))
+    #         k_index = int(data[i][0] - 1)
+    #         dos[k_index, e_index] = data[i][2]
+    #     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
+    #     sym =sym/max(sym)*max(k)
+    #     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
+    #     plt.pcolormesh(k, e, dos.T, cmap='magma', shading='auto')
+    #     plt.xticks(sym,self.label)
+    #     for i in range(1,len(sym)-1):
+    #         plt.axvline(sym[i],c='white')
+    #     plt.axhline(float(fermi),c='white')
+    #     if ylim:
+    #         plt.ylim(ylim)
+    #     plt.ylabel('Energy (eV)')
+    #     plt.title(label)
+    #     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/kdos_{label}.png')

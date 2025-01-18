@@ -197,8 +197,8 @@ class project:
         final_cell = utils.strain(initial_cell,axis,value)
         self.config['pw']['cell_parameters'] = final_cell
 
-    def plot(self,calculation,save=False,xlim=False,ylim=False,figsize=False,save_name=False,title=False):
-        plots.plot(self,calculation=calculation,save=save,xlim=xlim,ylim=ylim,figsize=figsize,save_name=save_name,title=title)
+    def plot(self,calculation,atom=None,orbital=None,save=False,xlim=False,ylim=False,figsize=False,save_name=False,title=False):
+        plots.plot(self, calculation=calculation,atom=atom, orbital=orbital,save=save,xlim=xlim,ylim=ylim,figsize=figsize,save_name=save_name,title=title)
 
     def nbnd(self,number):
         self.config['pw']['system']['nbnd']=number
@@ -355,10 +355,12 @@ class project:
             self.config['projwfc']['projwfc']['emax']=emax
         if deltaE:
             self.config['projwfc']['projwfc']['deltaE']=deltaE
-    def kdos(self,deltaE=0.005,ngauss=0,degauss=0.01):
+    def kdos(self,deltaE=0.005,ngauss=0,degauss=0.01,Emin=-20,Emax=20):
             self.config['projwfc']['projwfc']['degauss']=degauss
             self.config['projwfc']['projwfc']['deltaE']=deltaE
             self.config['projwfc']['projwfc']['ngauss']=ngauss
+            self.config['projwfc']['projwfc']['Emin']=Emin
+            self.config['projwfc']['projwfc']['Emax']=Emax
     def test(self,parameter_name,start,end,step,conv_thr=False,num_core=1,debug=False,out=False,dual=4):
         result = utils.test_parameter(self=self,parameter_name=parameter_name,conv_thr=conv_thr,start=start,end=end,step=step,num_core=num_core,debug=debug,out=out,dual=dual)
         # if parameter=='ecutwfc':
