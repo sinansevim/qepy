@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import glob
 import os
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.colors as mcolors
+
+
 
 # Function to read k-resolved PDOS files and sum over s, p, or d orbitals
 def read_pdos_files(directory, atom, orbital):
@@ -47,7 +52,7 @@ def read_pdos_files(directory, atom, orbital):
     return {"ik": ik_values, "E": energy_values, "pdos": summed_pdos}
 
 # Function to plot k-resolved PDOS using plt.pcolormesh()
-def plot_k_resolved_pdos(directory, atom, orbital, fermi=0, sym=None, labels=None, ylim=None, cmap="Reds"):
+def plot_k_resolved_pdos(directory, atom, orbital, fermi=0, sym=None, labels=None, ylim=None, cmap=None):
     pdos_data = read_pdos_files(directory, atom, orbital)
 
     if not pdos_data:
@@ -70,7 +75,17 @@ def plot_k_resolved_pdos(directory, atom, orbital, fermi=0, sym=None, labels=Non
     k_grid, e_grid = np.meshgrid(k, e)
     
     plt.figure(figsize=(8, 6))
-    plt.pcolormesh(k_grid, e_grid-float(fermi), dos, cmap=cmap, shading='auto')
+    # Define a custom colormap that starts from white and moves through pink shades
+    white_to_pink_cmap = mcolors.LinearSegmentedColormap.from_list(
+    "white_to_pink",
+    [
+        "#FFFFFF",  # White
+        "#FFC0CB",  # Light pink
+        "#FF69B4",  # Hot pink
+        "#FF1493"   # Deep pink
+    ]
+    )
+    plt.pcolormesh(k_grid, e_grid-float(fermi), dos, cmap=white_to_pink_cmap, shading='auto')
     sym =sym/max(sym)*max(k)
     # Add symmetry points if provided
     plt.xticks(sym, labels)

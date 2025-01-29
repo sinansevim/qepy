@@ -43,6 +43,7 @@ def defaultConfig():
     "num_print_cycles": "10",
     "geninterp": "true",
     "auto_projections": "true",
+    "write_xyz": "true",
     "write_hr": "true",
     "bands_plot": "true",
     "bands_num_points" : "200"

@@ -59,13 +59,15 @@ def plot_electron(self,ylim=False,show=False,save=True,figsize=False,save_name=F
     if remove_fermi==True:
         bands -= fermi
         fermi = 0
+    elif remove_fermi==False:
+        plt.text(-0.22, float(fermi), r'$\epsilon_{F}$',color='red')
+
     for band in range(len(bands)):
         plt.plot(k, bands[band, :],c='black')
     plt.xticks(sym,self.label)
     for i in range(1,len(sym)-1):
         plt.axvline(sym[i],c='black')
     plt.axhline(float(fermi),c='red')
-    plt.text(-0.2, float(fermi), r'$\epsilon_{Fermi}$',color='red')
     plt.ylim(ylim[0],ylim[1])
     plt.xlim(sym[0],sym[-1])
     if title!=False:
@@ -182,13 +184,13 @@ def plot_pdos(self,xlim=False,save=False):
     plt.legend(frameon=False)
     plt.savefig(f'./Projects/{self.project_id}/{self.job_id}/pdos.png')
 
-def plot_kdos(self,atom,orbital,ylim=False,save=True):
+def plot_kdos(self,atom,orbital,ylim=False,save=True,cmap="Reds"):
     directory = f'Projects/{self.project_id}/{self.job_id}'
     sym = reads.read_symmetries(f'./Projects/{self.project_id}/{self.job_id}/bands-pp.out')
     
     labels= self.label
     fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
-    kdos.plot_k_resolved_pdos(directory, atom, orbital, fermi=fermi, sym=sym, labels=labels)
+    kdos.plot_k_resolved_pdos(directory, atom, orbital, fermi=fermi, sym=sym, labels=labels,cmap=cmap)
     # files = glob.glob(f'./Projects/{self.project_id}/{self.job_id}/sumkdos*')
     # files.append(f'./Projects/{self.project_id}/{self.job_id}/dos.k.pdos_tot')
     # fermi = reads.read_efermi(f'./Projects/{self.project_id}/{self.job_id}/scf.out')
