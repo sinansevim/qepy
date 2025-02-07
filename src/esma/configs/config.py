@@ -3,7 +3,7 @@ import json
 def defaultConfig():
   config = {
   "metadata":{
-
+    "debug":"False"
     },
   "pw": {
     "control": { "pseudo_dir": "./pseudos/NC" },
@@ -30,23 +30,24 @@ def defaultConfig():
     "inputpp": {
       "write_amn": "true",
       "write_mmn": "true",
-      "write_unk": "true",
-      "scdm_proj": "true",
-      "scdm_entanglement": "erfc",
-      "scdm_mu": "10",
-      "scdm_sigma": "4"
+      # "write_unk": "true",
+      # "scdm_proj": "true",
+      # "scdm_entanglement": "erfc",
+      # "scdm_mu": "10",
+      # "scdm_sigma": "4"
     }
   },
   "wannier90": {
-    "num_iter": "0",
-    "dis_num_iter": "0",
+    # "num_iter": "0",
+    # "dis_num_iter": "0",
+    # "auto_projections": "true",
     "num_print_cycles": "10",
-    "geninterp": "true",
-    "auto_projections": "true",
+    # "geninterp": "true",
     "write_xyz": "true",
     "write_hr": "true",
     "bands_plot": "true",
-    "bands_num_points" : "200"
+    "kpath":"true",
+    # "bands_num_points" : "200"
   },
   "hp":{
     "inputhp":{

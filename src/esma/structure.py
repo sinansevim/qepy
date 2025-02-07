@@ -1,4 +1,3 @@
-from . import seekpath
 from markupsafe import escape
 import copy
 import io

@@ -20,11 +20,28 @@ class project:
         self.path = False
         self.label=False
         self.poscar= False
-        self.debug = False
+        # self.debug = False
         self.magnetism=False
         self.gpu = False
         self.num_core=1
-        self.outdir=False
+        self.config['metadata']['outdir']=False
+        self.config['metadata']['debug']=False
+
+
+    def dis_win_min(self,value):
+        self.config['wannier90']['dis_win_min'] = value
+
+    def dis_win_max(self,value):
+        self.config['wannier90']['dis_win_max'] = value
+
+    def dis_froz_min(self,value):
+        self.config['wannier90']['dis_froz_min'] = value
+
+    def dis_froz_max(self,value):
+        self.config['wannier90']['dis_froz_max'] = value
+    def num_wann(self,value):
+        self.config['wannier90']['num_wann'] = value
+
 
     def set_cores(self,value=False):
         if value==False:
@@ -33,7 +50,15 @@ class project:
                 self.num_core =1 
         else:
             self.num_core=value
+    
+    def debug(self,value):
+        self.config['metadata']['debug'] = value
 
+    def outdir(self,value):
+        self.config['metadata']['outdir'] = value
+
+    def scdm(self,value):
+        self.config['metadata']['scdm'] = value
     def energy(self):
         return utils.get_total_energy(self)
     
@@ -245,6 +270,10 @@ class project:
             self.config['pw']['system'][f'angle1({i+1})']=angle1[j] #define angle1 for atoms
             self.config['pw']['system'][f'angle2({j+1})']=angle2[j]#define angle2 for atoms
         
+    def wannier_orbital(self,orbital):
+        self.config['wannier90']['wannier_orbital']=orbital #define angle1 for atoms
+
+
     def get_points(self,file_path=False,file_format=False):
         if file_format==False:
             file_format='qeinp-qetools'

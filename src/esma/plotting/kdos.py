@@ -6,18 +6,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as mcolors
 
+import glob
 
 
 # Function to read k-resolved PDOS files and sum over s, p, or d orbitals
 def read_pdos_files(directory, atom, orbital):
+
     if not os.path.isdir(directory):
         print(f"Error: Directory '{directory}' not found.")
         return {}
 
     # Find all files corresponding to the selected atom and orbital group (s, p, d)
-    file_pattern = os.path.join(directory, f"dos.k.pdos_atm*({atom})_wfc#*({orbital}_*)")
+    file_pattern = os.path.join(directory, f"dos.k.pdos_atm#*({atom})_wfc#*({orbital})")
+    
     files = sorted(glob.glob(file_pattern))  # Get all matching files
-
+    
     if not files:
         print(f"No PDOS files found for atom '{atom}' and orbital '{orbital}' in {directory}.")
         return {}

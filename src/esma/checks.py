@@ -2,18 +2,18 @@ from . import utils
 import os 
 
 def generic_check(self):
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     else:
-        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.config['metadata']['outdir']}"
     self.config[self.package][self.package]["prefix"] = self.job_id
     self.config[self.package][self.package][f"fil{self.package}"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.package}.dat'
 
 def d3hess_checks(self):
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     else:
-        self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config[self.package]["input"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.config['metadata']['outdir']}"
     self.config[self.package]["input"]["prefix"] = self.job_id
     self.config[self.package]["input"][f"filhess"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.hess'
     self.config['ph']['inputph']['dftd3_hess'] = f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.hess'
@@ -21,22 +21,41 @@ def d3hess_checks(self):
 
 def hp_checks(self):
     self.config[self.package]["inputhp"]["prefix"] = self.job_id
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     else:
-        self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config[self.package]["inputhp"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.config['metadata']['outdir']}"
 
 
 def pw2wannier90_checks(self):
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config[self.package]["inputpp"]["outdir"] = f"./"
     else:
-        self.config[self.package]["inputpp"]["outdir"] = f"./{self.outdir}"
+        self.config[self.package]["inputpp"]["outdir"] = f"./{self.config['metadata']['outdir']}"
     self.config[self.package]["inputpp"]["prefix"]    = self.job_id
     self.config[self.package]["inputpp"]["seedname"]  = self.job_id
+    try:
+        if self.config['metadata']['scdm']==True:
+            self.config[self.package]['inputpp']["scdm_proj"]='true'
+            try:
+                self.config[self.package]['inputpp']["scdm_entanglement"]
+            except:
+                self.config[self.package]['inputpp']["scdm_entanglement"]="erfc"
+    except:
+        pass
 
 def wannier90_checks(self):
-    self.config[self.package]["num_wann"]  = self.get_nbnd()
+    try:
+        if self.config['metadata']['scdm']==True:
+            self.config[self.package]["num_wann"]  = self.get_nbnd()
+            self.config[self.package]["num_iter"]  = 0
+            self.config[self.package]["dis_num_iter"]  = 0
+            self.config[self.package]["auto_projections"]  = "true"
+        else:
+            self.config[self.package]["num_bands"]  = self.get_nbnd()
+    except:
+            self.config[self.package]["num_bands"]  = self.get_nbnd()
+        
     try:
         if self.config['pw']['system']['lspinorb'] == True:
             self.config[self.package]["spinors"]  = 'true'
@@ -87,10 +106,10 @@ def pw_checks(self):
     config['control']['calculation'] = self.calculation
     # Set outfolders
     create_folders(project_id=project_id,job_id=job_id)
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/"
     else:
-        config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/{self.outdir}"
+        config["control"]["outdir"] = f"./Projects/{project_id}/{job_id}/{self.config['metadata']['outdir']}"
     
 
     cell, atoms = config['cell_parameters'], config['atomic_positions']
@@ -118,18 +137,18 @@ def projwfc_checks(self):
         self.config[self.package][self.package]["filpdos"]  = f'./Projects/{self.project_id}/{self.job_id}/dos.k'
         self.config[self.package][self.package]["kresolveddos"]  = 'true'
         self.config[self.package][self.package]["degauss"]  =  self.config['pw']['system']['degauss']
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     else:
-        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.config['metadata']['outdir']}"
     self.config[self.package][self.package]["prefix"] = self.job_id
 
 
 def bands_checks(self):
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     else:
-        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config[self.package][self.package]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.config['metadata']['outdir']}"
     
     self.config[self.package][self.package]["prefix"] = self.job_id
     self.config[self.package][self.package][f"filband"]  = f'./Projects/{self.project_id}/{self.job_id}/{self.package}.dat'
@@ -137,10 +156,10 @@ def bands_checks(self):
 
 
 def ph_checks(self):
-    if self.outdir==False:
+    if self.config['metadata']['outdir']==False:
         self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/"
     else:
-        self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.outdir}"
+        self.config['ph']["inputph"]["outdir"] = f"./Projects/{self.project_id}/{self.job_id}/{self.config['metadata']['outdir']}"
     
     self.config['ph']["inputph"]['prefix'] = self.job_id
     self.config['ph']["inputph"]["fildyn"]= f'./Projects/{self.project_id}/{self.job_id}/{self.job_id}.dyn'

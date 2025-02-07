@@ -21,7 +21,7 @@ def plot(self,calculation,save,atom,orbital,xlim=False,ylim=False,figsize=False,
 
 
 def plot_wannier90(self,ylim,save):
-    ef = self.fermi_energy()
+    ef = self.fermi_energy(calculation='nscf')
     data = np.loadtxt(f'./Projects/{self.project_id}/{self.job_id}/bands.dat.gnu')
     k = np.unique(data[:, 0])
     k = k/max(k)
@@ -35,9 +35,9 @@ def plot_wannier90(self,ylim,save):
     for i in range(int(len(data)/kpt)):
         plt.plot(k_path,data.T[1].reshape(-1,kpt)[i]-ef,c='b')
     plt.axhline(0,c='r')
-    plt.xticks(sym.T[1].astype(int),sym.T[0])
+    plt.xticks((sym.T[1].astype(int)-1)/kpt,sym.T[0])
     for i in sym.T[1]:
-        plt.axvline(k_path[int(i)-1],c='black')
+        plt.axvline(k_path[int(i)-1]/max(k),c='black')
     plt.xlim(0,1)
     if ylim==False:
         plt.ylim(-5,5)

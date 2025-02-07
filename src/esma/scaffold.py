@@ -6,7 +6,8 @@ from .inputs.pw2wannier90 import pw2wannier90
 
 
 def constructor(self):
-    generic(self)
+    if self.package!='wannier90':
+        generic(self)
     if self.package=='pw':
         pw(self)
     elif self.package=='matdyn':
